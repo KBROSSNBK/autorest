@@ -492,18 +492,14 @@ function openOrderModal(table, floor){
     table.items.forEach(function(item){
       const row = document.createElement('div');
       row.className = 'item-row';
+      const priceEach = item.price.toFixed(2);
+      const lineTotal = (item.price * item.qty).toFixed(2);
       row.innerHTML =
-        '<span class="name">' + escapeHtml(item.name) + '<br><small style="color:#94a3b8;">
-</script>
-</body>
-</html> + item.price.toFixed(2) + ' c/u</small></span>' +
+        '<span class="name">' + escapeHtml(item.name) + '<br><small style="color:#94a3b8;">precio unidad ' + priceEach + '</small></span>' +
         '<button class="qty-btn" data-act="minus">-</button>' +
         '<span>' + item.qty + '</span>' +
         '<button class="qty-btn" data-act="plus">+</button>' +
-        '<span>
-</script>
-</body>
-</html> + (item.price * item.qty).toFixed(2) + '</span>' +
+        '<span>' + lineTotal + '</span>' +
         '<button class="qty-btn" data-act="remove">&times;</button>';
       row.querySelector('[data-act="plus"]').onclick = function(){ item.qty++; refresh(); };
       row.querySelector('[data-act="minus"]').onclick = function(){ item.qty = Math.max(1, item.qty - 1); refresh(); };
