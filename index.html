@@ -1,88 +1,114 @@
 <!DOCTYPE html>
-  <html lang="es">
-  <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AutoRest - Gestion de Mesas</title>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoRest - Gestion de Mesas</title>
 <style>
 :root{
-  --bg:#f4f5f7;
+  --bg:#eef2f7;
   --panel:#ffffff;
-  --border:#dcdfe4;
-  --accent:#2563eb;
+  --border:#e2e8f0;
+  --accent:#4f46e5;
+  --accent-dark:#4338ca;
   --free:#22c55e;
   --occupied:#f59e0b;
-      --danger:#ef4444;
-      --text:#1f2430;
+  --danger:#ef4444;
+  --text:#1e293b;
+  --muted:#64748b;
+  --radius:14px;
+  --shadow:0 8px 24px rgba(30,41,59,0.10);
 }
 *{box-sizing:border-box;}
-body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text);}
-header{background:var(--panel);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
-header h1{font-size:18px;margin:0;margin-right:12px;}
-.floors{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
-.floor-tab{position:relative;padding:6px 12px;border:1px solid var(--border);border-radius:6px;background:#eef1f5;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px;}
-.floor-tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
-.floor-tab .mini-btn{opacity:0.6;font-size:11px;padding:0 2px;}
-.floor-tab .mini-btn:hover{opacity:1;}
-.add-floor-btn{padding:6px 10px;border-radius:6px;border:1px dashed #9aa3af;background:transparent;cursor:pointer;color:#555;}
-#canvas-wrap{position:relative;height:calc(100vh - 130px);overflow:auto;background:repeating-linear-gradient(0deg, transparent, transparent 24px, #e8eaee 25px),repeating-linear-gradient(90deg, transparent, transparent 24px, #e8eaee 25px);}
+body{margin:0;font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--bg);color:var(--text);}
+header{background:linear-gradient(135deg,#1e293b,#334155);padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;box-shadow:0 2px 10px rgba(0,0,0,0.15);position:relative;z-index:20;}
+header h1{font-size:19px;margin:0;margin-right:8px;color:#fff;letter-spacing:.3px;font-weight:700;}
+.floors{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.floor-tab{position:relative;padding:8px 14px;border-radius:20px;background:rgba(255,255,255,0.12);cursor:pointer;font-size:13px;display:flex;align-items:center;gap:8px;color:#e2e8f0;transition:background .15s,color .15s;}
+.floor-tab:hover{background:rgba(255,255,255,0.22);}
+.floor-tab.active{background:#fff;color:#1e293b;box-shadow:var(--shadow);font-weight:600;}
+.floor-tab .mini-btn{opacity:.6;font-size:11px;padding:2px 5px;border-radius:5px;}
+.floor-tab .mini-btn:hover{opacity:1;background:rgba(0,0,0,0.08);}
+.add-floor-btn{padding:8px 14px;border-radius:20px;border:1.5px dashed rgba(255,255,255,0.5);background:transparent;cursor:pointer;color:#e2e8f0;font-size:13px;transition:background .15s;}
+.add-floor-btn:hover{background:rgba(255,255,255,0.1);}
+#canvas-wrap{position:relative;height:calc(100vh - 126px);overflow:auto;background-color:#eef2f7;background-image:radial-gradient(circle,#d7dee8 1.5px,transparent 1.5px);background-size:26px 26px;}
 #canvas{position:relative;min-width:100%;min-height:100%;}
-.empty-hint{position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);color:#9aa3af;font-size:14px;text-align:center;pointer-events:none;width:80%;}
-.table-el{position:absolute;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:14px;user-select:none;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.2);border:3px solid rgba(0,0,0,0.15);text-align:center;padding:4px;}
-.table-el.square{border-radius:10px;}
+.empty-hint{position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);color:#94a3b8;font-size:14px;text-align:center;pointer-events:none;width:80%;line-height:1.6;}
+.table-el{position:absolute;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;user-select:none;cursor:pointer;box-shadow:0 6px 16px rgba(15,23,42,0.22);border:4px solid rgba(255,255,255,0.55);text-align:center;padding:4px;transition:box-shadow .15s;letter-spacing:.2px;}
+.table-el:hover{box-shadow:0 8px 20px rgba(15,23,42,0.32);}
+.table-el.square{border-radius:14px;}
 .table-el.circle{border-radius:50%;}
-.table-el .status-dot{position:absolute;bottom:-4px;left:-4px;width:14px;height:14px;border-radius:50%;border:2px solid #fff;}
-.table-el .bell{position:absolute;top:-10px;right:-10px;width:26px;height:26px;border-radius:50%;background:#fff;border:2px solid #ccc;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;color:#555;}
+.table-el .status-dot{position:absolute;bottom:-3px;left:-3px;width:15px;height:15px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3);}
+.table-el .bell{position:absolute;top:-11px;right:-11px;width:26px;height:26px;border-radius:50%;background:#fff;border:2px solid #e2e8f0;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;color:#94a3b8;box-shadow:0 2px 6px rgba(0,0,0,0.15);}
 .table-el .bell.active{background:var(--danger);color:#fff;border-color:var(--danger);}
 .table-el.blink{animation:blinkAnim 1s infinite;}
 @keyframes blinkAnim{
-    0%{box-shadow:0 0 0 0 rgba(239,68,68,0.7);}
-  50%{box-shadow:0 0 0 14px rgba(239,68,68,0);}
+  0%{box-shadow:0 0 0 0 rgba(239,68,68,0.7);}
+  50%{box-shadow:0 0 0 16px rgba(239,68,68,0);}
   100%{box-shadow:0 0 0 0 rgba(239,68,68,0);}
 }
-#buildBar{position:fixed;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--border);z-index:50;}
-#buildToggle{position:absolute;right:16px;top:-42px;background:var(--accent);color:#fff;border:none;border-radius:8px 8px 0 0;padding:8px 14px;cursor:pointer;font-size:15px;}
-#buildPanel{display:none;padding:12px 16px;gap:10px;flex-wrap:wrap;align-items:center;}
+#buildBar{position:fixed;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--border);z-index:50;box-shadow:0 -6px 20px rgba(0,0,0,0.08);}
+#buildToggle{position:absolute;right:20px;top:-52px;background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;border:none;border-radius:50%;width:52px;height:52px;cursor:pointer;font-size:20px;box-shadow:0 6px 16px rgba(79,70,229,0.4);}
+#buildToggle:hover{filter:brightness(1.08);}
+#buildPanel{display:none;padding:14px 20px;gap:14px;flex-wrap:wrap;align-items:center;}
 #buildPanel.open{display:flex;}
-#buildPanel .switch-row{display:flex;align-items:center;gap:8px;font-size:13px;}
-.btn{padding:7px 12px;border-radius:6px;border:1px solid var(--border);background:#eef1f5;cursor:pointer;font-size:13px;}
+.switch-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);}
+.switch{position:relative;display:inline-block;width:40px;height:22px;}
+.switch input{opacity:0;width:0;height:0;}
+.switch-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#cbd5e1;border-radius:22px;transition:.2s;}
+.switch-slider:before{position:absolute;content:"";height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;}
+.switch input:checked + .switch-slider{background:var(--accent);}
+.switch input:checked + .switch-slider:before{transform:translateX(18px);}
+.btn{padding:9px 14px;border-radius:9px;border:1px solid var(--border);background:#f8fafc;cursor:pointer;font-size:13px;color:var(--text);transition:background .15s,transform .1s;}
+.btn:hover{background:#eef1f5;}
+.btn:active{transform:scale(0.97);}
 .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
-.btn.danger{background:var(--danger);color:#fff;border-color:var(--danger);}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:100;}
-.modal{background:var(--panel);border-radius:10px;width:380px;max-width:92vw;max-height:88vh;overflow-y:auto;padding:18px;}
-.modal h2{margin-top:0;font-size:17px;display:flex;justify-content:space-between;align-items:center;}
-.modal .close-x{cursor:pointer;color:#888;font-size:18px;}
-.form-row{margin-bottom:10px;}
-  .form-row label{display:block;font-size:12px;color:#555;margin-bottom:4px;}
-  .form-row input[type=text], .form-row input[type=number], .form-row select{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px;}
-.item-row{display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid #eee;font-size:13px;}
+.btn.primary:hover{background:var(--accent-dark);}
+.btn.danger{background:#fff;color:var(--danger);border-color:#fecaca;}
+.btn.danger:hover{background:#fef2f2;}
+.hint-bar{font-size:12px;color:var(--muted);}
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.5);display:flex;align-items:center;justify-content:center;z-index:100;}
+.modal{background:var(--panel);border-radius:16px;width:380px;max-width:92vw;max-height:88vh;overflow-y:auto;padding:20px;box-shadow:0 20px 50px rgba(0,0,0,0.3);}
+.modal h2{margin-top:0;font-size:17px;display:flex;justify-content:space-between;align-items:center;color:var(--text);}
+.modal .close-x{cursor:pointer;color:var(--muted);font-size:16px;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#f1f5f9;}
+.modal .close-x:hover{background:#e2e8f0;color:var(--text);}
+.modal p{font-size:14px;color:var(--text);line-height:1.5;}
+.form-row{margin-bottom:12px;}
+.form-row label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:600;}
+.form-row input[type=text], .form-row input[type=number], .form-row select{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:#f8fafc;}
+.form-row input:focus, .form-row select:focus{outline:2px solid var(--accent);outline-offset:1px;}
+.item-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:13px;}
 .item-row .name{flex:1;}
-.qty-btn{width:24px;height:24px;border-radius:50%;border:1px solid var(--border);background:#eef1f5;cursor:pointer;}
-.totals{margin-top:10px;border-top:1px solid var(--border);padding-top:10px;font-size:13px;}
-.totals .row{display:flex;justify-content:space-between;margin-bottom:4px;}
-.totals .grand{font-weight:700;font-size:15px;}
-.assist-row{display:flex;align-items:center;justify-content:space-between;background:#fff7ed;border:1px solid #fed7aa;padding:8px 10px;border-radius:6px;margin-bottom:10px;font-size:13px;}
-.hint-bar{font-size:12px;color:#777;}
+.qty-btn{width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:#f8fafc;cursor:pointer;font-weight:700;color:var(--text);}
+.qty-btn:hover{background:#e2e8f0;}
+.totals{margin-top:12px;background:#f8fafc;border-radius:10px;padding:12px 14px;font-size:13px;}
+.totals .row{display:flex;justify-content:space-between;margin-bottom:6px;color:var(--muted);}
+.totals .grand{font-weight:700;font-size:16px;color:var(--text);border-top:1px solid var(--border);padding-top:8px;margin-top:4px;}
+.assist-row{display:flex;align-items:center;justify-content:space-between;background:#fff7ed;border:1px solid #fed7aa;padding:10px 12px;border-radius:10px;margin-bottom:12px;font-size:13px;gap:10px;}
 </style>
-  </head>
-  <body>
-  <header>
-    <h1>AutoRest</h1>
-    <div class="floors" id="floorsContainer"></div>
-    <button class="add-floor-btn" id="addFloorBtn">+ Piso</button>
-  </header>
-  <div id="canvas-wrap">
-    <div id="canvas"></div>
-  </div>
+</head>
+<body>
+<header>
+  <h1>AutoRest</h1>
+  <div class="floors" id="floorsContainer"></div>
+  <button class="add-floor-btn" id="addFloorBtn">+ Piso</button>
+</header>
+<div id="canvas-wrap">
+  <div id="canvas"></div>
+</div>
 
-  <div id="buildBar">
-    <button id="buildToggle">Menu de construccion</button>
+<div id="buildBar">
+  <button id="buildToggle" title="Menu de construccion">&#128736;</button>
   <div id="buildPanel">
-    <div class="switch-row">
-      <label><input type="checkbox" id="editModeChk"> Modo edicion (mover / crear)</label>
-      </div>
-      <button class="btn" id="addCircleBtn">Agregar mesa circular</button>
-    <button class="btn" id="addSquareBtn">Agregar mesa cuadrada</button>
+    <label class="switch-row">
+      <span class="switch">
+        <input type="checkbox" id="editModeChk">
+        <span class="switch-slider"></span>
+      </span>
+      Modo edicion (mover / crear)
+    </label>
+    <button class="btn" id="addCircleBtn">&#9711; Mesa circular</button>
+    <button class="btn" id="addSquareBtn">&#9635; Mesa cuadrada</button>
     <span class="hint-bar" id="hintBar"></span>
   </div>
 </div>
@@ -91,8 +117,8 @@ header h1{font-size:18px;margin:0;margin-right:12px;}
 
 const STORAGE_KEY = 'autorest_state_v1';
 function defaultState(){
-    return {
-          floors: [
+  return {
+    floors: [
       {id:'f1', name:'Piso 1', tables:[]},
       {id:'f2', name:'Piso 2', tables:[]},
       {id:'f3', name:'Piso 4', tables:[]},
@@ -100,34 +126,94 @@ function defaultState(){
       {id:'f5', name:'Sotano', tables:[]}
     ],
     activeFloor: 'f1',
-          editMode: false
-      };
-      }
-let state = loadState();
+    editMode: false
+  };
+}
 function loadState(){
-    try{
+  try{
     const raw = localStorage.getItem(STORAGE_KEY);
     if(raw) return JSON.parse(raw);
-    }catch(e){}
+  }catch(e){}
   return defaultState();
 }
+let state = loadState();
 function saveState(){
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 function uid(prefix){
-    return prefix + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+  return prefix + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
 }
 function getActiveFloor(){
-    return state.floors.find(function(f){ return f.id === state.activeFloor; }) || state.floors[0];
+  return state.floors.find(function(f){ return f.id === state.activeFloor; }) || state.floors[0];
+}
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, function(m){
+    if(m === '&') return '&amp;';
+    if(m === '<') return '&lt;';
+    if(m === '>') return '&gt;';
+    if(m === '"') return '&quot;';
+    return '&#39;';
+  });
+}
+function showPrompt(title, defaultValue, onOk){
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML =
+    '<div class="modal" style="width:300px;">' +
+      '<h2>' + escapeHtml(title) + '</h2>' +
+      '<div class="form-row"><input type="text" id="promptInput" value="' + escapeHtml(defaultValue || '') + '"></div>' +
+      '<div style="display:flex;gap:8px;justify-content:flex-end;">' +
+        '<button class="btn" id="promptCancel">Cancelar</button>' +
+        '<button class="btn primary" id="promptOk">Aceptar</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+  const input = overlay.querySelector('#promptInput');
+  setTimeout(function(){ input.focus(); input.select(); }, 0);
+  function ok(){ const v = input.value; overlay.remove(); onOk(v); }
+  overlay.querySelector('#promptCancel').onclick = function(){ overlay.remove(); };
+  overlay.querySelector('#promptOk').onclick = ok;
+  input.addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ e.preventDefault(); ok(); }
+    if(e.key === 'Escape'){ overlay.remove(); }
+  });
+}
+function showConfirm(message, onYes){
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML =
+    '<div class="modal" style="width:320px;">' +
+      '<p>' + escapeHtml(message) + '</p>' +
+      '<div style="display:flex;gap:8px;justify-content:flex-end;">' +
+        '<button class="btn" id="confirmNo">Cancelar</button>' +
+        '<button class="btn danger" id="confirmYes">Confirmar</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+  overlay.querySelector('#confirmNo').onclick = function(){ overlay.remove(); };
+  overlay.querySelector('#confirmYes').onclick = function(){ overlay.remove(); onYes(); };
+}
+function showAlert(message){
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML =
+    '<div class="modal" style="width:300px;">' +
+      '<p>' + escapeHtml(message) + '</p>' +
+      '<div style="display:flex;justify-content:flex-end;">' +
+        '<button class="btn primary" id="alertOk">OK</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+  overlay.querySelector('#alertOk').onclick = function(){ overlay.remove(); };
 }
 
 const floorsContainer = document.getElementById('floorsContainer');
 function renderFloors(){
-    floorsContainer.innerHTML = '';
+  floorsContainer.innerHTML = '';
   state.floors.forEach(function(floor){
-        const tab = document.createElement('div');
-        tab.className = 'floor-tab' + (floor.id === state.activeFloor ? ' active' : '');
-              const nameSpan = document.createElement('span');
+    const tab = document.createElement('div');
+    tab.className = 'floor-tab' + (floor.id === state.activeFloor ? ' active' : '');
+    const nameSpan = document.createElement('span');
     nameSpan.textContent = floor.name;
     nameSpan.onclick = function(){ state.activeFloor = floor.id; saveState(); renderFloors(); renderCanvas(); };
     tab.appendChild(nameSpan);
@@ -138,8 +224,9 @@ function renderFloors(){
     editBtn.title = 'Renombrar piso';
     editBtn.onclick = function(e){
       e.stopPropagation();
-      const nn = prompt('Nuevo nombre del piso:', floor.name);
-      if(nn && nn.trim()){ floor.name = nn.trim(); saveState(); renderFloors(); }
+      showPrompt('Nuevo nombre del piso', floor.name, function(nn){
+        if(nn && nn.trim()){ floor.name = nn.trim(); saveState(); renderFloors(); }
+      });
     };
     tab.appendChild(editBtn);
 
@@ -149,39 +236,38 @@ function renderFloors(){
     delBtn.title = 'Eliminar piso';
     delBtn.onclick = function(e){
       e.stopPropagation();
-      if(state.floors.length <= 1){ alert('Debe existir al menos un piso.'); return; }
-      if(confirm('Eliminar el piso ' + floor.name + ' y todas sus mesas?')){
+      if(state.floors.length <= 1){ showAlert('Debe existir al menos un piso.'); return; }
+      showConfirm('Eliminar el piso ' + floor.name + ' y todas sus mesas?', function(){
         state.floors = state.floors.filter(function(f){ return f.id !== floor.id; });
         if(state.activeFloor === floor.id) state.activeFloor = state.floors[0].id;
         saveState(); renderFloors(); renderCanvas();
-      }
+      });
     };
     tab.appendChild(delBtn);
 
     floorsContainer.appendChild(tab);
-});
-      }
-
+  });
+}
 document.getElementById('addFloorBtn').onclick = function(){
-  const name = prompt('Nombre del nuevo piso:');
-  if(name && name.trim()){
-    const f = {id:uid('f'), name:name.trim(), tables:[]};
-    state.floors.push(f);
-    state.activeFloor = f.id;
-    saveState(); renderFloors(); renderCanvas();
-  }
+  showPrompt('Nombre del nuevo piso', '', function(name){
+    if(name && name.trim()){
+      const f = {id:uid('f'), name:name.trim(), tables:[]};
+      state.floors.push(f);
+      state.activeFloor = f.id;
+      saveState(); renderFloors(); renderCanvas();
+    }
+  });
 };
-
 const canvas = document.getElementById('canvas');
 let dragged = false;
 function fillStyleToCss(color, fillStyle){
-    if(fillStyle === 'gradient'){ return 'linear-gradient(135deg, ' + color + ', #ffffffaa)'; }
+  if(fillStyle === 'gradient'){ return 'linear-gradient(135deg, ' + color + ', #ffffffaa)'; }
   if(fillStyle === 'striped'){ return 'repeating-linear-gradient(45deg, ' + color + ', ' + color + ' 8px, #ffffff55 8px, #ffffff55 16px)'; }
   if(fillStyle === 'dotted'){ return 'radial-gradient(#ffffff88 20%, transparent 21%) 0 0/12px 12px, ' + color; }
   return color;
 }
 function renderCanvas(){
-    canvas.innerHTML = '';
+  canvas.innerHTML = '';
   const floor = getActiveFloor();
   if(!floor){ return; }
   if(floor.tables.length === 0){
@@ -191,9 +277,9 @@ function renderCanvas(){
     canvas.appendChild(hint);
   }
   floor.tables.forEach(function(table){
-        const el = document.createElement('div');
-        el.className = 'table-el ' + table.shape + (table.assistance ? ' blink' : '');
-              el.style.left = table.x + 'px';
+    const el = document.createElement('div');
+    el.className = 'table-el ' + table.shape + (table.assistance ? ' blink' : '');
+    el.style.left = table.x + 'px';
     el.style.top = table.y + 'px';
     el.style.width = table.size + 'px';
     el.style.height = table.size + 'px';
@@ -207,7 +293,7 @@ function renderCanvas(){
 
     const bell = document.createElement('div');
     bell.className = 'bell' + (table.assistance ? ' active' : '');
-          bell.textContent = 'A';
+    bell.textContent = String.fromCodePoint(128276);
     bell.title = 'Solicitar o cancelar asistencia';
     bell.onclick = function(e){
       e.stopPropagation();
@@ -223,13 +309,13 @@ function renderCanvas(){
     };
 
     el.addEventListener('mousedown', function(e){
-            if(!state.editMode) return;
+      if(!state.editMode) return;
       e.preventDefault();
       const startX = e.clientX, startY = e.clientY;
       const origX = table.x, origY = table.y;
       dragged = false;
       function onMove(ev){
-                const dx = ev.clientX - startX, dy = ev.clientY - startY;
+        const dx = ev.clientX - startX, dy = ev.clientY - startY;
         if(Math.abs(dx) > 3 || Math.abs(dy) > 3) dragged = true;
         table.x = Math.max(0, origX + dx);
         table.y = Math.max(0, origY + dy);
@@ -237,7 +323,7 @@ function renderCanvas(){
         el.style.top = table.y + 'px';
       }
       function onUp(){
-                document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mousemove', onMove);
         document.removeEventListener('mouseup', onUp);
         if(dragged) saveState();
       }
@@ -246,8 +332,8 @@ function renderCanvas(){
     });
 
     canvas.appendChild(el);
-});
-      }
+  });
+}
 
 const buildToggle = document.getElementById('buildToggle');
 const buildPanel = document.getElementById('buildPanel');
@@ -255,7 +341,7 @@ buildToggle.onclick = function(){ buildPanel.classList.toggle('open'); };
 const editModeChk = document.getElementById('editModeChk');
 editModeChk.checked = state.editMode;
 function updateHint(){
-    document.getElementById('hintBar').textContent = state.editMode ? 'Arrastra las mesas para moverlas. Haz clic en una mesa para editar sus propiedades.' : '';
+  document.getElementById('hintBar').textContent = state.editMode ? 'Arrastra las mesas para moverlas. Haz clic en una mesa para editar sus propiedades.' : '';
 }
 editModeChk.onchange = function(){
   state.editMode = editModeChk.checked;
@@ -264,60 +350,56 @@ editModeChk.onchange = function(){
 };
 updateHint();
 function addTable(shape){
-    const floor = getActiveFloor();
-  const label = prompt('Nombre o numero de la mesa:', String(floor.tables.length + 1));
-  if(label === null) return;
-  const table = {
-        id: uid('t'),
-              shape: shape,
-              label: label || String(floor.tables.length + 1),
-              x: 40 + (floor.tables.length * 20) % 300,
-              y: 40 + (floor.tables.length * 15) % 200,
-              size: 80,
-              color: '#2563eb',
-              fillStyle: 'solid',
-              items: [],
-              tipPercent: 10,
-              tipEnabled: true,
-              assistance: false
-          };
-  floor.tables.push(table);
-  state.editMode = true;
-  editModeChk.checked = true;
-  updateHint();
-  saveState();
-  renderCanvas();
+  const floor = getActiveFloor();
+  showPrompt('Nombre o numero de la mesa', String(floor.tables.length + 1), function(label){
+    const table = {
+      id: uid('t'),
+      shape: shape,
+      label: label || String(floor.tables.length + 1),
+      x: 40 + (floor.tables.length * 20) % 300,
+      y: 40 + (floor.tables.length * 15) % 200,
+      size: 80,
+      color: '#4f46e5',
+      fillStyle: 'solid',
+      items: [],
+      tipPercent: 10,
+      tipEnabled: true,
+      assistance: false
+    };
+    floor.tables.push(table);
+    state.editMode = true;
+    editModeChk.checked = true;
+    updateHint();
+    saveState();
+    renderCanvas();
+  });
 }
 document.getElementById('addCircleBtn').onclick = function(){ addTable('circle'); };
 document.getElementById('addSquareBtn').onclick = function(){ addTable('square'); };
-function escapeHtml(str){
-    return String(str).replace(/[&<>"']/g, function(m){
-          if(m === '&') return '&amp;';
-          if(m === '<') return '&lt;';
-          if(m === '>') return '&gt;';
-          if(m === '"') return '&quot;';
-          return '&#39;';
-});
-}
-
+const PRESET_COLORS = ['#4f46e5','#0ea5e9','#22c55e','#f59e0b','#ef4444','#a855f7','#14b8a6','#64748b'];
 function openEditModal(table, floor){
-    const overlay = document.createElement('div');
+  const overlay = document.createElement('div');
   overlay.className = 'modal-overlay';
+  let presetsHtml = '';
+  PRESET_COLORS.forEach(function(c){
+    presetsHtml += '<span style="background:' + c + '" data-color="' + c + '"></span>';
+  });
   overlay.innerHTML =
-        '<div class="modal">' +
-          '<h2>Editar elemento <span class="close-x">X</span></h2>' +
-          '<div class="form-row"><label>Nombre / numero</label>' +
-            '<input type="text" id="edtLabel" value="' + escapeHtml(table.label) + '"></div>' +
-          '<div class="form-row"><label>Forma</label>' +
-            '<select id="edtShape">' +
-              '<option value="circle"' + (table.shape === 'circle' ? ' selected' : '') + '>Circulo</option>' +
-              '<option value="square"' + (table.shape === 'square' ? ' selected' : '') + '>Cuadrado</option>' +
-            '</select></div>' +
-          '<div class="form-row"><label>Tamano (px): <span id="sizeVal">' + table.size + '</span></label>' +
-            '<input type="range" id="edtSize" min="40" max="220" value="' + table.size + '"></div>' +
-          '<div class="form-row"><label>Color</label>' +
-            '<input type="color" id="edtColor" value="' + table.color + '"></div>' +
-          '<div class="form-row"><label>Estilo de relleno</label>' +
+    '<div class="modal">' +
+      '<h2>Editar elemento <span class="close-x">&times;</span></h2>' +
+      '<div class="form-row"><label>Nombre / numero</label>' +
+        '<input type="text" id="edtLabel" value="' + escapeHtml(table.label) + '"></div>' +
+      '<div class="form-row"><label>Forma</label>' +
+        '<select id="edtShape">' +
+          '<option value="circle"' + (table.shape === 'circle' ? ' selected' : '') + '>Circulo</option>' +
+          '<option value="square"' + (table.shape === 'square' ? ' selected' : '') + '>Cuadrado</option>' +
+        '</select></div>' +
+      '<div class="form-row"><label>Tamano (px): <span id="sizeVal">' + table.size + '</span></label>' +
+        '<input type="range" id="edtSize" min="40" max="220" value="' + table.size + '"></div>' +
+      '<div class="form-row"><label>Color</label>' +
+        '<input type="color" id="edtColor" value="' + table.color + '">' +
+        '<div class="color-presets" id="colorPresets">' + presetsHtml + '</div></div>' +
+      '<div class="form-row"><label>Estilo de relleno</label>' +
         '<select id="edtFill">' +
           '<option value="solid"' + (table.fillStyle === 'solid' ? ' selected' : '') + '>Solido</option>' +
           '<option value="gradient"' + (table.fillStyle === 'gradient' ? ' selected' : '') + '>Degradado</option>' +
@@ -333,7 +415,10 @@ function openEditModal(table, floor){
   overlay.querySelector('.close-x').onclick = function(){ overlay.remove(); };
   overlay.addEventListener('click', function(e){ if(e.target === overlay) overlay.remove(); });
   overlay.querySelector('#edtSize').addEventListener('input', function(e){
-        overlay.querySelector('#sizeVal').textContent = e.target.value;
+    overlay.querySelector('#sizeVal').textContent = e.target.value;
+  });
+  overlay.querySelectorAll('#colorPresets span').forEach(function(sw){
+    sw.onclick = function(){ overlay.querySelector('#edtColor').value = sw.getAttribute('data-color'); };
   });
   overlay.querySelector('#saveEdt').onclick = function(){
     table.label = overlay.querySelector('#edtLabel').value || table.label;
@@ -346,43 +431,43 @@ function openEditModal(table, floor){
     overlay.remove();
   };
   overlay.querySelector('#delTable').onclick = function(){
-    if(confirm('Eliminar esta mesa o elemento? Esta accion no se puede deshacer.')){
+    showConfirm('Eliminar esta mesa o elemento? Esta accion no se puede deshacer.', function(){
       floor.tables = floor.tables.filter(function(t){ return t.id !== table.id; });
       saveState();
       renderCanvas();
       overlay.remove();
-      }
-    };
-  }
+    });
+  };
+}
 
 function openOrderModal(table, floor){
-    const overlay = document.createElement('div');
+  const overlay = document.createElement('div');
   overlay.className = 'modal-overlay';
   overlay.innerHTML =
-        '<div class="modal">' +
-          '<h2>Mesa ' + escapeHtml(table.label) + ' <span class="close-x">X</span></h2>' +
-          '<div class="assist-row"><span id="assistText"></span>' +
-            '<button class="btn" id="toggleAssist"></button></div>' +
-          '<div id="itemsList"></div>' +
-          '<div style="display:flex;gap:6px;margin-top:8px;">' +
-            '<input type="text" id="newItemName" placeholder="Producto" style="flex:2;padding:6px;border:1px solid #dcdfe4;border-radius:6px;">' +
-            '<input type="number" id="newItemPrice" placeholder="Precio" style="flex:1;padding:6px;border:1px solid #dcdfe4;border-radius:6px;">' +
-            '<button class="btn" id="addItemBtn">Anadir</button>' +
-          '</div>' +
-          '<div class="totals">' +
-            '<div class="row"><span>Subtotal</span><span id="subtotalVal">0.00</span></div>' +
-            '<div class="row"><label><input type="checkbox" id="tipEnabled"> Propina</label>' +
-              '<span><input type="number" id="tipPercent" style="width:50px;" min="0" max="100"> %</span></div>' +
-            '<div class="row"><span>Propina</span><span id="tipVal">0.00</span></div>' +
-            '<div class="row grand"><span>Total</span><span id="totalVal">0.00</span></div>' +
-          '</div>' +
-          '<div style="display:flex;gap:8px;margin-top:14px;">' +
-            '<button class="btn primary" id="chargeBtn">Cobrar y liberar mesa</button>' +
-          '</div>' +
-        '</div>';
+    '<div class="modal">' +
+      '<h2>Mesa ' + escapeHtml(table.label) + ' <span class="close-x">&times;</span></h2>' +
+      '<div class="assist-row"><span id="assistText"></span>' +
+        '<button class="btn" id="toggleAssist"></button></div>' +
+      '<div id="itemsList"></div>' +
+      '<div style="display:flex;gap:6px;margin-top:8px;">' +
+        '<input type="text" id="newItemName" placeholder="Producto" style="flex:2;padding:8px;border:1px solid #e2e8f0;border-radius:8px;">' +
+        '<input type="number" id="newItemPrice" placeholder="Precio" style="flex:1;padding:8px;border:1px solid #e2e8f0;border-radius:8px;">' +
+        '<button class="btn primary" id="addItemBtn">+</button>' +
+      '</div>' +
+      '<div class="totals">' +
+        '<div class="row"><span>Subtotal</span><span id="subtotalVal">0.00</span></div>' +
+        '<div class="row"><label><input type="checkbox" id="tipEnabled"> Propina</label>' +
+          '<span><input type="number" id="tipPercent" style="width:50px;" min="0" max="100"> %</span></div>' +
+        '<div class="row"><span>Propina</span><span id="tipVal">0.00</span></div>' +
+        '<div class="row grand"><span>Total</span><span id="totalVal">0.00</span></div>' +
+      '</div>' +
+      '<div style="display:flex;gap:8px;margin-top:14px;">' +
+        '<button class="btn primary" id="chargeBtn">Cobrar y liberar mesa</button>' +
+      '</div>' +
+    '</div>';
   document.body.appendChild(overlay);
   function updateAssistUI(){
-        overlay.querySelector('#assistText').textContent = table.assistance ? 'Esta mesa solicito asistencia' : 'Sin solicitud de asistencia';
+    overlay.querySelector('#assistText').textContent = table.assistance ? 'Esta mesa solicito asistencia' : 'Sin solicitud de asistencia';
     overlay.querySelector('#toggleAssist').textContent = table.assistance ? 'Marcar atendida' : 'Solicitar asistencia';
   }
   updateAssistUI();
@@ -398,31 +483,36 @@ function openOrderModal(table, floor){
   const tipPercentInp = overlay.querySelector('#tipPercent');
   tipEnabledChk.checked = table.tipEnabled;
   tipPercentInp.value = table.tipPercent;
-
   function renderItems(){
-        const list = overlay.querySelector('#itemsList');
+    const list = overlay.querySelector('#itemsList');
     list.innerHTML = '';
-          if(table.items.length === 0){
-      list.innerHTML = '<div style="font-size:12px;color:#888;padding:6px 0;">Sin productos aun.</div>';
-          }
+    if(table.items.length === 0){
+      list.innerHTML = '<div style="font-size:12px;color:#94a3b8;padding:6px 0;">Sin productos aun.</div>';
+    }
     table.items.forEach(function(item){
-            const row = document.createElement('div');
-            row.className = 'item-row';
+      const row = document.createElement('div');
+      row.className = 'item-row';
       row.innerHTML =
-                '<span class="name">' + escapeHtml(item.name) + '<br><small style="color:#888;">$' + item.price.toFixed(2) + ' c/u</small></span>' +
-                '<button class="qty-btn" data-act="minus">-</button>' +
-                '<span>' + item.qty + '</span>' +
-                '<button class="qty-btn" data-act="plus">+</button>' +
-                '<span>$' + (item.price * item.qty).toFixed(2) + '</span>' +
-                '<button class="qty-btn" data-act="remove">X</button>';
+        '<span class="name">' + escapeHtml(item.name) + '<br><small style="color:#94a3b8;">
+</script>
+</body>
+</html> + item.price.toFixed(2) + ' c/u</small></span>' +
+        '<button class="qty-btn" data-act="minus">-</button>' +
+        '<span>' + item.qty + '</span>' +
+        '<button class="qty-btn" data-act="plus">+</button>' +
+        '<span>
+</script>
+</body>
+</html> + (item.price * item.qty).toFixed(2) + '</span>' +
+        '<button class="qty-btn" data-act="remove">&times;</button>';
       row.querySelector('[data-act="plus"]').onclick = function(){ item.qty++; refresh(); };
       row.querySelector('[data-act="minus"]').onclick = function(){ item.qty = Math.max(1, item.qty - 1); refresh(); };
       row.querySelector('[data-act="remove"]').onclick = function(){ table.items = table.items.filter(function(i){ return i.id !== item.id; }); refresh(); };
       list.appendChild(row);
-                                                                   });
+    });
   }
   function refresh(){
-        renderItems();
+    renderItems();
     const subtotal = table.items.reduce(function(s, i){ return s + i.price * i.qty; }, 0);
     const tipPercent = parseFloat(tipPercentInp.value) || 0;
     table.tipPercent = tipPercent;
@@ -441,27 +531,31 @@ function openOrderModal(table, floor){
     const priceInp = overlay.querySelector('#newItemPrice');
     const name = nameInp.value.trim();
     const price = parseFloat(priceInp.value);
-    if(!name || isNaN(price) || price < 0){ alert('Ingresa un nombre y precio valido.'); return; }
+    if(!name || isNaN(price) || price < 0){ showAlert('Ingresa un nombre y precio valido.'); return; }
     table.items.push({id: uid('i'), name: name, price: price, qty: 1});
     nameInp.value = '';
-          priceInp.value = '';
-                refresh();
+    priceInp.value = '';
+    refresh();
   };
-  overlay.querySelector('#chargeBtn').onclick = function(){
-    if(table.items.length === 0){
-      if(!confirm('La mesa no tiene productos. Deseas liberarla de todos modos?')) return;
-    } else if(!confirm('Confirmar cobro y liberar la mesa?')) return;
+  function doCharge(){
     table.items = [];
     table.assistance = false;
     saveState();
     overlay.remove();
     renderCanvas();
+  }
+  overlay.querySelector('#chargeBtn').onclick = function(){
+    if(table.items.length === 0){
+      showConfirm('La mesa no tiene productos. Deseas liberarla de todos modos?', doCharge);
+    } else {
+      showConfirm('Confirmar cobro y liberar la mesa?', doCharge);
+    }
   };
   refresh();
 }
 renderFloors();
 renderCanvas();
+
 </script>
-  </body>
-  </html>
-  
+</body>
+</html>
