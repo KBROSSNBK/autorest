@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+  <html lang="es">
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoRest - Gestion de Mesas</title>
+<style>
+:root{
+  --bg:#f4f5f7;
+  --panel:#ffffff;
+  --border:#dcdfe4;
+  --accent:#2563eb;
+  --free:#22c55e;
+  --occupied:#f59e0b;
+      --danger:#ef4444;
+      --text:#1f2430;
+}
+*{box-sizing:border-box;}
+body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text);}
+header{background:var(--panel);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+header h1{font-size:18px;margin:0;margin-right:12px;}
+.floors{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.floor-tab{position:relative;padding:6px 12px;border:1px solid var(--border);border-radius:6px;background:#eef1f5;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px;}
+.floor-tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.floor-tab .mini-btn{opacity:0.6;font-size:11px;padding:0 2px;}
+.floor-tab .mini-btn:hover{opacity:1;}
+.add-floor-btn{padding:6px 10px;border-radius:6px;border:1px dashed #9aa3af;background:transparent;cursor:pointer;color:#555;}
+#canvas-wrap{position:relative;height:calc(100vh - 130px);overflow:auto;background:repeating-linear-gradient(0deg, transparent, transparent 24px, #e8eaee 25px),repeating-linear-gradient(90deg, transparent, transparent 24px, #e8eaee 25px);}
+#canvas{position:relative;min-width:100%;min-height:100%;}
+.empty-hint{position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);color:#9aa3af;font-size:14px;text-align:center;pointer-events:none;width:80%;}
+.table-el{position:absolute;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:14px;user-select:none;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.2);border:3px solid rgba(0,0,0,0.15);text-align:center;padding:4px;}
+.table-el.square{border-radius:10px;}
+.table-el.circle{border-radius:50%;}
+.table-el .status-dot{position:absolute;bottom:-4px;left:-4px;width:14px;height:14px;border-radius:50%;border:2px solid #fff;}
+.table-el .bell{position:absolute;top:-10px;right:-10px;width:26px;height:26px;border-radius:50%;background:#fff;border:2px solid #ccc;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;color:#555;}
+.table-el .bell.active{background:var(--danger);color:#fff;border-color:var(--danger);}
+.table-el.blink{animation:blinkAnim 1s infinite;}
+@keyframes blinkAnim{
+    0%{box-shadow:0 0 0 0 rgba(239,68,68,0.7);}
+  50%{box-shadow:0 0 0 14px rgba(239,68,68,0);}
+  100%{box-shadow:0 0 0 0 rgba(239,68,68,0);}
+}
+#buildBar{position:fixed;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--border);z-index:50;}
+#buildToggle{position:absolute;right:16px;top:-42px;background:var(--accent);color:#fff;border:none;border-radius:8px 8px 0 0;padding:8px 14px;cursor:pointer;font-size:15px;}
+#buildPanel{display:none;padding:12px 16px;gap:10px;flex-wrap:wrap;align-items:center;}
+#buildPanel.open{display:flex;}
+#buildPanel .switch-row{display:flex;align-items:center;gap:8px;font-size:13px;}
+.btn{padding:7px 12px;border-radius:6px;border:1px solid var(--border);background:#eef1f5;cursor:pointer;font-size:13px;}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+.btn.danger{background:var(--danger);color:#fff;border-color:var(--danger);}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:100;}
+.modal{background:var(--panel);border-radius:10px;width:380px;max-width:92vw;max-height:88vh;overflow-y:auto;padding:18px;}
+.modal h2{margin-top:0;font-size:17px;display:flex;justify-content:space-between;align-items:center;}
+.modal .close-x{cursor:pointer;color:#888;font-size:18px;}
+.form-row{margin-bottom:10px;}
+  .form-row label{display:block;font-size:12px;color:#555;margin-bottom:4px;}
+  .form-row input[type=text], .form-row input[type=number], .form-row select{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px;}
+.item-row{display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid #eee;font-size:13px;}
+.item-row .name{flex:1;}
+.qty-btn{width:24px;height:24px;border-radius:50%;border:1px solid var(--border);background:#eef1f5;cursor:pointer;}
+.totals{margin-top:10px;border-top:1px solid var(--border);padding-top:10px;font-size:13px;}
+.totals .row{display:flex;justify-content:space-between;margin-bottom:4px;}
+.totals .grand{font-weight:700;font-size:15px;}
+.assist-row{display:flex;align-items:center;justify-content:space-between;background:#fff7ed;border:1px solid #fed7aa;padding:8px 10px;border-radius:6px;margin-bottom:10px;font-size:13px;}
+.hint-bar{font-size:12px;color:#777;}
+</style>
+  </head>
+  <body>
+  <header>
+    <h1>AutoRest</h1>
+    <div class="floors" id="floorsContainer"></div>
+    <button class="add-floor-btn" id="addFloorBtn">+ Piso</button>
+  </header>
+  <div id="canvas-wrap">
+    <div id="canvas"></div>
+  </div>
+
+  <div id="buildBar">
+    <button id="buildToggle">Menu de construccion</button>
+  <div id="buildPanel">
+    <div class="switch-row">
+      <label><input type="checkbox" id="editModeChk"> Modo edicion (mover / crear)</label>
+      </div>
+      <button class="btn" id="addCircleBtn">Agregar mesa circular</button>
+    <button class="btn" id="addSquareBtn">Agregar mesa cuadrada</button>
+    <span class="hint-bar" id="hintBar"></span>
+  </div>
+</div>
+
+<script>
+
+const STORAGE_KEY = 'autorest_state_v1';
+function defaultState(){
+    return {
+          floors: [
+      {id:'f1', name:'Piso 1', tables:[]},
+      {id:'f2', name:'Piso 2', tables:[]},
+      {id:'f3', name:'Piso 4', tables:[]},
+      {id:'f4', name:'Bodega', tables:[]},
+      {id:'f5', name:'Sotano', tables:[]}
+    ],
+    activeFloor: 'f1',
+          editMode: false
+      };
+      }
+let state = loadState();
+function loadState(){
+    try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+    }catch(e){}
+  return defaultState();
+}
+function saveState(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+function uid(prefix){
+    return prefix + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+}
+function getActiveFloor(){
+    return state.floors.find(function(f){ return f.id === state.activeFloor; }) || state.floors[0];
+}
+
+const floorsContainer = document.getElementById('floorsContainer');
+function renderFloors(){
+    floorsContainer.innerHTML = '';
+  state.floors.forEach(function(floor){
+        const tab = document.createElement('div');
+        tab.className = 'floor-tab' + (floor.id === state.activeFloor ? ' active' : '');
+              const nameSpan = document.createElement('span');
+    nameSpan.textContent = floor.name;
+    nameSpan.onclick = function(){ state.activeFloor = floor.id; saveState(); renderFloors(); renderCanvas(); };
+    tab.appendChild(nameSpan);
+
+    const editBtn = document.createElement('span');
+    editBtn.className = 'mini-btn';
+    editBtn.textContent = 'Ren';
+    editBtn.title = 'Renombrar piso';
+    editBtn.onclick = function(e){
+      e.stopPropagation();
+      const nn = prompt('Nuevo nombre del piso:', floor.name);
+      if(nn && nn.trim()){ floor.name = nn.trim(); saveState(); renderFloors(); }
+    };
+    tab.appendChild(editBtn);
+
+    const delBtn = document.createElement('span');
+    delBtn.className = 'mini-btn';
+    delBtn.textContent = 'Del';
+    delBtn.title = 'Eliminar piso';
+    delBtn.onclick = function(e){
+      e.stopPropagation();
+      if(state.floors.length <= 1){ alert('Debe existir al menos un piso.'); return; }
+      if(confirm('Eliminar el piso ' + floor.name + ' y todas sus mesas?')){
+        state.floors = state.floors.filter(function(f){ return f.id !== floor.id; });
+        if(state.activeFloor === floor.id) state.activeFloor = state.floors[0].id;
+        saveState(); renderFloors(); renderCanvas();
+      }
+    };
+    tab.appendChild(delBtn);
+
+    floorsContainer.appendChild(tab);
+});
+      }
+
+document.getElementById('addFloorBtn').onclick = function(){
+  const name = prompt('Nombre del nuevo piso:');
+  if(name && name.trim()){
+    const f = {id:uid('f'), name:name.trim(), tables:[]};
+    state.floors.push(f);
+    state.activeFloor = f.id;
+    saveState(); renderFloors(); renderCanvas();
+  }
+};
+
+const canvas = document.getElementById('canvas');
+let dragged = false;
+function fillStyleToCss(color, fillStyle){
+    if(fillStyle === 'gradient'){ return 'linear-gradient(135deg, ' + color + ', #ffffffaa)'; }
+  if(fillStyle === 'striped'){ return 'repeating-linear-gradient(45deg, ' + color + ', ' + color + ' 8px, #ffffff55 8px, #ffffff55 16px)'; }
+  if(fillStyle === 'dotted'){ return 'radial-gradient(#ffffff88 20%, transparent 21%) 0 0/12px 12px, ' + color; }
+  return color;
+}
+function renderCanvas(){
+    canvas.innerHTML = '';
+  const floor = getActiveFloor();
+  if(!floor){ return; }
+  if(floor.tables.length === 0){
+    const hint = document.createElement('div');
+    hint.className = 'empty-hint';
+    hint.textContent = 'Lienzo vacio. Usa el menu de construccion (abajo) para agregar mesas.';
+    canvas.appendChild(hint);
+  }
+  floor.tables.forEach(function(table){
+        const el = document.createElement('div');
+        el.className = 'table-el ' + table.shape + (table.assistance ? ' blink' : '');
+              el.style.left = table.x + 'px';
+    el.style.top = table.y + 'px';
+    el.style.width = table.size + 'px';
+    el.style.height = table.size + 'px';
+    el.style.background = fillStyleToCss(table.color, table.fillStyle);
+    el.textContent = table.label;
+
+    const dot = document.createElement('div');
+    dot.className = 'status-dot';
+    dot.style.background = (table.items && table.items.length > 0) ? 'var(--occupied)' : 'var(--free)';
+    el.appendChild(dot);
+
+    const bell = document.createElement('div');
+    bell.className = 'bell' + (table.assistance ? ' active' : '');
+          bell.textContent = 'A';
+    bell.title = 'Solicitar o cancelar asistencia';
+    bell.onclick = function(e){
+      e.stopPropagation();
+      table.assistance = !table.assistance;
+      saveState(); renderCanvas();
+    };
+    el.appendChild(bell);
+
+    el.onclick = function(e){
+      if(dragged){ dragged = false; return; }
+      if(state.editMode){ openEditModal(table, floor); }
+      else{ openOrderModal(table, floor); }
+    };
+
+    el.addEventListener('mousedown', function(e){
+            if(!state.editMode) return;
+      e.preventDefault();
+      const startX = e.clientX, startY = e.clientY;
+      const origX = table.x, origY = table.y;
+      dragged = false;
+      function onMove(ev){
+                const dx = ev.clientX - startX, dy = ev.clientY - startY;
+        if(Math.abs(dx) > 3 || Math.abs(dy) > 3) dragged = true;
+        table.x = Math.max(0, origX + dx);
+        table.y = Math.max(0, origY + dy);
+        el.style.left = table.x + 'px';
+        el.style.top = table.y + 'px';
+      }
+      function onUp(){
+                document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        if(dragged) saveState();
+      }
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+
+    canvas.appendChild(el);
+});
+      }
+
+const buildToggle = document.getElementById('buildToggle');
+const buildPanel = document.getElementById('buildPanel');
+buildToggle.onclick = function(){ buildPanel.classList.toggle('open'); };
+const editModeChk = document.getElementById('editModeChk');
+editModeChk.checked = state.editMode;
+function updateHint(){
+    document.getElementById('hintBar').textContent = state.editMode ? 'Arrastra las mesas para moverlas. Haz clic en una mesa para editar sus propiedades.' : '';
+}
+editModeChk.onchange = function(){
+  state.editMode = editModeChk.checked;
+  updateHint();
+  saveState();
+};
+updateHint();
+function addTable(shape){
+    const floor = getActiveFloor();
+  const label = prompt('Nombre o numero de la mesa:', String(floor.tables.length + 1));
+  if(label === null) return;
+  const table = {
+        id: uid('t'),
+              shape: shape,
+              label: label || String(floor.tables.length + 1),
+              x: 40 + (floor.tables.length * 20) % 300,
+              y: 40 + (floor.tables.length * 15) % 200,
+              size: 80,
+              color: '#2563eb',
+              fillStyle: 'solid',
+              items: [],
+              tipPercent: 10,
+              tipEnabled: true,
+              assistance: false
+          };
+  floor.tables.push(table);
+  state.editMode = true;
+  editModeChk.checked = true;
+  updateHint();
+  saveState();
+  renderCanvas();
+}
+document.getElementById('addCircleBtn').onclick = function(){ addTable('circle'); };
+document.getElementById('addSquareBtn').onclick = function(){ addTable('square'); };
+function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, function(m){
+          if(m === '&') return '&amp;';
+          if(m === '<') return '&lt;';
+          if(m === '>') return '&gt;';
+          if(m === '"') return '&quot;';
+          return '&#39;';
+});
+}
+
+function openEditModal(table, floor){
+    const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML =
+        '<div class="modal">' +
+          '<h2>Editar elemento <span class="close-x">X</span></h2>' +
+          '<div class="form-row"><label>Nombre / numero</label>' +
+            '<input type="text" id="edtLabel" value="' + escapeHtml(table.label) + '"></div>' +
+          '<div class="form-row"><label>Forma</label>' +
+            '<select id="edtShape">' +
+              '<option value="circle"' + (table.shape === 'circle' ? ' selected' : '') + '>Circulo</option>' +
+              '<option value="square"' + (table.shape === 'square' ? ' selected' : '') + '>Cuadrado</option>' +
+            '</select></div>' +
+          '<div class="form-row"><label>Tamano (px): <span id="sizeVal">' + table.size + '</span></label>' +
+            '<input type="range" id="edtSize" min="40" max="220" value="' + table.size + '"></div>' +
+          '<div class="form-row"><label>Color</label>' +
+            '<input type="color" id="edtColor" value="' + table.color + '"></div>' +
+          '<div class="form-row"><label>Estilo de relleno</label>' +
+        '<select id="edtFill">' +
+          '<option value="solid"' + (table.fillStyle === 'solid' ? ' selected' : '') + '>Solido</option>' +
+          '<option value="gradient"' + (table.fillStyle === 'gradient' ? ' selected' : '') + '>Degradado</option>' +
+          '<option value="striped"' + (table.fillStyle === 'striped' ? ' selected' : '') + '>Rayado</option>' +
+          '<option value="dotted"' + (table.fillStyle === 'dotted' ? ' selected' : '') + '>Punteado</option>' +
+        '</select></div>' +
+      '<div style="display:flex;gap:8px;margin-top:14px;">' +
+        '<button class="btn primary" id="saveEdt">Guardar cambios</button>' +
+        '<button class="btn danger" id="delTable">Eliminar</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+  overlay.querySelector('.close-x').onclick = function(){ overlay.remove(); };
+  overlay.addEventListener('click', function(e){ if(e.target === overlay) overlay.remove(); });
+  overlay.querySelector('#edtSize').addEventListener('input', function(e){
+        overlay.querySelector('#sizeVal').textContent = e.target.value;
+  });
+  overlay.querySelector('#saveEdt').onclick = function(){
+    table.label = overlay.querySelector('#edtLabel').value || table.label;
+    table.shape = overlay.querySelector('#edtShape').value;
+    table.size = parseInt(overlay.querySelector('#edtSize').value, 10);
+    table.color = overlay.querySelector('#edtColor').value;
+    table.fillStyle = overlay.querySelector('#edtFill').value;
+    saveState();
+    renderCanvas();
+    overlay.remove();
+  };
+  overlay.querySelector('#delTable').onclick = function(){
+    if(confirm('Eliminar esta mesa o elemento? Esta accion no se puede deshacer.')){
+      floor.tables = floor.tables.filter(function(t){ return t.id !== table.id; });
+      saveState();
+      renderCanvas();
+      overlay.remove();
+      }
+    };
+  }
+
+function openOrderModal(table, floor){
+    const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML =
+        '<div class="modal">' +
+          '<h2>Mesa ' + escapeHtml(table.label) + ' <span class="close-x">X</span></h2>' +
+          '<div class="assist-row"><span id="assistText"></span>' +
+            '<button class="btn" id="toggleAssist"></button></div>' +
+          '<div id="itemsList"></div>' +
+          '<div style="display:flex;gap:6px;margin-top:8px;">' +
+            '<input type="text" id="newItemName" placeholder="Producto" style="flex:2;padding:6px;border:1px solid #dcdfe4;border-radius:6px;">' +
+            '<input type="number" id="newItemPrice" placeholder="Precio" style="flex:1;padding:6px;border:1px solid #dcdfe4;border-radius:6px;">' +
+            '<button class="btn" id="addItemBtn">Anadir</button>' +
+          '</div>' +
+          '<div class="totals">' +
+            '<div class="row"><span>Subtotal</span><span id="subtotalVal">0.00</span></div>' +
+            '<div class="row"><label><input type="checkbox" id="tipEnabled"> Propina</label>' +
+              '<span><input type="number" id="tipPercent" style="width:50px;" min="0" max="100"> %</span></div>' +
+            '<div class="row"><span>Propina</span><span id="tipVal">0.00</span></div>' +
+            '<div class="row grand"><span>Total</span><span id="totalVal">0.00</span></div>' +
+          '</div>' +
+          '<div style="display:flex;gap:8px;margin-top:14px;">' +
+            '<button class="btn primary" id="chargeBtn">Cobrar y liberar mesa</button>' +
+          '</div>' +
+        '</div>';
+  document.body.appendChild(overlay);
+  function updateAssistUI(){
+        overlay.querySelector('#assistText').textContent = table.assistance ? 'Esta mesa solicito asistencia' : 'Sin solicitud de asistencia';
+    overlay.querySelector('#toggleAssist').textContent = table.assistance ? 'Marcar atendida' : 'Solicitar asistencia';
+  }
+  updateAssistUI();
+  overlay.querySelector('.close-x').onclick = function(){ saveState(); overlay.remove(); renderCanvas(); };
+  overlay.addEventListener('click', function(e){ if(e.target === overlay){ saveState(); overlay.remove(); renderCanvas(); } });
+  overlay.querySelector('#toggleAssist').onclick = function(){
+    table.assistance = !table.assistance;
+    saveState();
+    updateAssistUI();
+    renderCanvas();
+  };
+  const tipEnabledChk = overlay.querySelector('#tipEnabled');
+  const tipPercentInp = overlay.querySelector('#tipPercent');
+  tipEnabledChk.checked = table.tipEnabled;
+  tipPercentInp.value = table.tipPercent;
+
+  function renderItems(){
+        const list = overlay.querySelector('#itemsList');
+    list.innerHTML = '';
+          if(table.items.length === 0){
+      list.innerHTML = '<div style="font-size:12px;color:#888;padding:6px 0;">Sin productos aun.</div>';
+          }
+    table.items.forEach(function(item){
+            const row = document.createElement('div');
+            row.className = 'item-row';
+      row.innerHTML =
+                '<span class="name">' + escapeHtml(item.name) + '<br><small style="color:#888;">$' + item.price.toFixed(2) + ' c/u</small></span>' +
+                '<button class="qty-btn" data-act="minus">-</button>' +
+                '<span>' + item.qty + '</span>' +
+                '<button class="qty-btn" data-act="plus">+</button>' +
+                '<span>$' + (item.price * item.qty).toFixed(2) + '</span>' +
+                '<button class="qty-btn" data-act="remove">X</button>';
+      row.querySelector('[data-act="plus"]').onclick = function(){ item.qty++; refresh(); };
+      row.querySelector('[data-act="minus"]').onclick = function(){ item.qty = Math.max(1, item.qty - 1); refresh(); };
+      row.querySelector('[data-act="remove"]').onclick = function(){ table.items = table.items.filter(function(i){ return i.id !== item.id; }); refresh(); };
+      list.appendChild(row);
+                                                                   });
+  }
+  function refresh(){
+        renderItems();
+    const subtotal = table.items.reduce(function(s, i){ return s + i.price * i.qty; }, 0);
+    const tipPercent = parseFloat(tipPercentInp.value) || 0;
+    table.tipPercent = tipPercent;
+    table.tipEnabled = tipEnabledChk.checked;
+    const tip = table.tipEnabled ? subtotal * (tipPercent / 100) : 0;
+    overlay.querySelector('#subtotalVal').textContent = subtotal.toFixed(2);
+    overlay.querySelector('#tipVal').textContent = tip.toFixed(2);
+    overlay.querySelector('#totalVal').textContent = (subtotal + tip).toFixed(2);
+    renderCanvas();
+    saveState();
+  }
+  tipEnabledChk.onchange = refresh;
+  tipPercentInp.oninput = refresh;
+  overlay.querySelector('#addItemBtn').onclick = function(){
+    const nameInp = overlay.querySelector('#newItemName');
+    const priceInp = overlay.querySelector('#newItemPrice');
+    const name = nameInp.value.trim();
+    const price = parseFloat(priceInp.value);
+    if(!name || isNaN(price) || price < 0){ alert('Ingresa un nombre y precio valido.'); return; }
+    table.items.push({id: uid('i'), name: name, price: price, qty: 1});
+    nameInp.value = '';
+          priceInp.value = '';
+                refresh();
+  };
+  overlay.querySelector('#chargeBtn').onclick = function(){
+    if(table.items.length === 0){
+      if(!confirm('La mesa no tiene productos. Deseas liberarla de todos modos?')) return;
+    } else if(!confirm('Confirmar cobro y liberar la mesa?')) return;
+    table.items = [];
+    table.assistance = false;
+    saveState();
+    overlay.remove();
+    renderCanvas();
+  };
+  refresh();
+}
+renderFloors();
+renderCanvas();
+</script>
+  </body>
+  </html>
+  
