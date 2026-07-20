@@ -16,6 +16,7 @@
 --accent-grad:linear-gradient(135deg,#8b5cf6,#22d3ee);
 --free:#2dffb0;
 --occupied:#ffb347;
+--dirty:#9ca3c4;
 --danger:#ff3d6e;
 --text:#e8ecfb;
 --muted:#8993b8;
@@ -49,7 +50,9 @@ font-size:21px;margin:0;margin-right:4px;font-weight:800;letter-spacing:.5px;
 background:var(--accent-grad);-webkit-background-clip:text;background-clip:text;color:transparent;
 text-shadow:0 0 24px rgba(139,92,246,0.35);
 }
-.live-indicator{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);background:rgba(255,255,255,0.04);padding:6px 12px;border-radius:20px;border:1px solid var(--border-soft);}
+.live-indicator{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);background:rgba(255,255,255,0.04);padding:6px 12px;border-radius:20px;border:1px solid var(--border-soft);transition:all .2s;}
+.live-indicator.alert{background:rgba(255,61,110,0.15);border-color:rgba(255,61,110,0.5);color:#ffd7e1;animation:alertPulse 1.4s infinite;}
+@keyframes alertPulse{0%{box-shadow:0 0 0 0 rgba(255,61,110,0.5);}70%{box-shadow:0 0 0 10px rgba(255,61,110,0);}100%{box-shadow:0 0 0 0 rgba(255,61,110,0);}}
 .live-dot{width:9px;height:9px;border-radius:50%;background:#64748b;transition:background .3s, box-shadow .3s;}
 .live-dot.on{background:var(--free);box-shadow:0 0 10px 2px rgba(45,255,176,0.8);animation:pulseDot 1.6s infinite;}
 .live-dot.off{background:var(--danger);box-shadow:0 0 10px 2px rgba(255,61,110,0.7);}
@@ -127,17 +130,94 @@ transition:box-shadow .2s, transform .15s;
 .totals .row{display:flex;justify-content:space-between;margin-bottom:6px;color:var(--muted);}
 .totals .grand{font-weight:700;font-size:16px;color:#fff;border-top:1px solid var(--border-soft);padding-top:8px;margin-top:4px;}
 .assist-row{display:flex;align-items:center;justify-content:space-between;background:rgba(255,179,71,0.1);border:1px solid rgba(255,179,71,0.35);padding:10px 12px;border-radius:10px;margin-bottom:12px;font-size:13px;gap:10px;}
+
+.login-screen{position:fixed;inset:0;background:
+radial-gradient(circle at 15% 10%, rgba(139,92,246,0.18), transparent 40%),
+radial-gradient(circle at 85% 15%, rgba(34,211,238,0.15), transparent 45%),
+linear-gradient(180deg,var(--bg-a),var(--bg-b));
+display:flex;align-items:center;justify-content:center;z-index:300;}
+.login-box{background:var(--panel);border:1px solid var(--border-soft);border-radius:20px;padding:28px 26px;width:320px;max-width:90vw;text-align:center;box-shadow:var(--shadow);}
+.login-box h1{background:var(--accent-grad);-webkit-background-clip:text;background-clip:text;color:transparent;margin:0 0 6px;font-size:24px;}
+.login-box p{color:var(--muted);font-size:13px;margin:0 0 18px;}
+.login-box .form-row{text-align:left;}
+.pin-dots{display:flex;justify-content:center;gap:12px;margin-bottom:18px;}
+.pin-dots span{width:14px;height:14px;border-radius:50%;border:2px solid var(--border-soft);background:transparent;transition:all .15s;display:inline-block;}
+.pin-dots span.filled{background:var(--accent-grad);border-color:transparent;box-shadow:var(--glow-accent);}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.pin-pad button{padding:14px 0;border-radius:12px;border:1px solid var(--border-soft);background:rgba(255,255,255,0.04);color:var(--text);font-size:18px;cursor:pointer;}
+.pin-pad button:hover{background:rgba(139,92,246,0.18);border-color:var(--accent);}
+.pin-pad button.wide{font-size:13px;color:var(--muted);}
+.login-error{color:var(--danger);font-size:12px;min-height:16px;margin-bottom:8px;}
+.role-badge{font-size:10px;padding:2px 8px;border-radius:10px;text-transform:uppercase;font-weight:700;letter-spacing:.4px;white-space:nowrap;}
+.role-badge.admin{background:rgba(139,92,246,0.25);color:#c9b6ff;}
+.role-badge.mesero{background:rgba(34,211,238,0.2);color:#8fe9fb;}
+.role-badge.cocina{background:rgba(255,179,71,0.2);color:#ffcf94;}
+.user-chip{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text);background:rgba(255,255,255,0.04);padding:6px 10px;border-radius:20px;border:1px solid var(--border-soft);margin-left:auto;}
+.user-chip button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;text-decoration:underline;padding:0;}
+.user-chip button:hover{color:#fff;}
+.assign-tag{position:absolute;top:-10px;left:-10px;background:rgba(10,12,26,0.9);border:1px solid var(--border-soft);border-radius:10px;padding:2px 6px;font-size:10px;color:#c7cdea;max-width:74px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.table-el.dirty{opacity:.6;filter:grayscale(.5);}
+.clean-tag{position:absolute;bottom:-10px;right:-10px;background:rgba(10,12,26,0.9);border:1px solid var(--border-soft);border-radius:10px;padding:2px 6px;font-size:10px;color:#c7cdea;white-space:nowrap;}
+#kitchenView{padding:18px;display:none;flex-wrap:wrap;gap:14px;align-content:flex-start;height:calc(100vh - 132px);overflow-y:auto;}
+.kview-card{background:var(--panel);border:1px solid var(--border-soft);border-radius:14px;padding:14px;width:260px;box-shadow:var(--shadow);height:fit-content;}
+.kview-card h3{margin:0 0 4px;font-size:15px;}
+.kview-card .kmeta{font-size:11px;color:var(--muted);margin-bottom:10px;}
+.kview-item{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:13px;gap:8px;}
+.kview-item.ready{opacity:.5;}
+.kview-item button{padding:4px 10px;border-radius:8px;border:1px solid var(--border-soft);background:rgba(255,255,255,0.05);color:var(--text);font-size:11px;cursor:pointer;white-space:nowrap;}
+.kview-item button:hover{background:rgba(34,211,238,0.2);border-color:var(--accent2);}
+.kview-empty{color:var(--muted);font-size:14px;text-align:center;margin-top:60px;width:100%;}
+.mini-color-row{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px;}
+.mini-color-row span{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid rgba(255,255,255,0.25);display:inline-block;}
+.mini-color-row span:hover{border-color:#fff;transform:scale(1.1);}
+.readonly-note{background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);padding:8px 12px;border-radius:10px;font-size:12px;color:#c9b6ff;margin-bottom:12px;}
+.cat-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.cat-filter-btn{padding:6px 12px;border-radius:16px;border:1px solid var(--border-soft);background:rgba(255,255,255,0.04);color:var(--muted);font-size:12px;cursor:pointer;white-space:nowrap;}
+.cat-filter-btn:hover{background:rgba(139,92,246,0.15);color:#fff;}
+.cat-filter-btn.active{background:var(--accent-grad);color:#0a0c1a;font-weight:700;border-color:transparent;}
+.cat-tiles-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;margin-bottom:14px;}
+.cat-tile{background:rgba(255,255,255,0.04);border:1px solid var(--border-soft);border-radius:12px;padding:14px 8px;text-align:center;cursor:pointer;transition:all .15s;}
+.cat-tile:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:var(--glow-accent);}
+.cat-tile .cat-icon{font-size:24px;margin-bottom:6px;height:44px;display:flex;align-items:center;justify-content:center;}
+.cat-tile .cat-icon img{width:100%;height:44px;object-fit:cover;border-radius:8px;}
+.cat-tile .cat-name{font-size:12px;font-weight:700;}
+.catalog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px;max-height:280px;overflow-y:auto;padding:2px;margin-bottom:14px;}
+.catalog-card{background:rgba(255,255,255,0.04);border:1px solid var(--border-soft);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;}
+.catalog-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:var(--glow-accent);}
+.catalog-card .thumb{width:100%;height:68px;background:rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--muted);}
+.catalog-card .thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.catalog-card .info{padding:6px 8px;}
+.catalog-card .info .pname{font-size:11px;font-weight:600;line-height:1.25;margin-bottom:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.catalog-card .info .pprice{font-size:11px;color:var(--accent2);font-weight:700;}
+.catalog-empty{grid-column:1/-1;font-size:12px;color:var(--muted);text-align:center;padding:16px 0;}
+.img-upload-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.img-preview{width:56px;height:56px;border-radius:10px;object-fit:cover;background:rgba(255,255,255,0.05);border:1px solid var(--border-soft);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--muted);overflow:hidden;}
+.img-preview img{width:100%;height:100%;object-fit:cover;}
+.img-upload-row input[type=file]{flex:1;font-size:11px;color:var(--muted);}
+.cat-tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+.cat-chip{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.04);border:1px solid var(--border-soft);border-radius:16px;padding:4px 6px 4px 12px;font-size:12px;cursor:pointer;}
+.cat-chip:hover{border-color:var(--accent);}
+.cat-chip button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:2px 4px;line-height:1;}
+.cat-chip button:hover{color:#fff;}
+.menu-item-row-admin{display:flex;align-items:center;gap:10px;}
+.thumb-sm{width:38px;height:38px;border-radius:8px;object-fit:cover;background:rgba(255,255,255,0.05);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--muted);overflow:hidden;}
+.thumb-sm img{width:100%;height:100%;object-fit:cover;}
 </style>
 </head>
 <body>
+<div id="loginScreen" class="login-screen" style="display:none;"></div>
+<div id="appRoot" style="display:none;">
 <header>
 <h1>AutoRest</h1>
-<div class="live-indicator"><span class="live-dot" id="liveDot"></span><span id="liveText">Conectando...</span></div>
+<div class="live-indicator" id="liveIndicator"><span class="live-dot" id="liveDot"></span><span id="liveText">Conectando...</span></div>
 <div class="floors" id="floorsContainer"></div>
 <button class="add-floor-btn" id="addFloorBtn">+ Piso</button>
+<button class="btn" id="kitchenToggleBtn" style="display:none;">&#127859; Cocina</button>
+<div class="user-chip" id="userChip" style="display:none;"></div>
 </header>
 <div id="canvas-wrap">
 <div id="canvas"></div>
+<div id="kitchenView"></div>
 </div>
 
 <div id="buildBar">
@@ -153,7 +233,9 @@ Modo edicion (mover / crear)
 <button class="btn" id="addCircleBtn">&#9711; Mesa circular</button>
 <button class="btn" id="addSquareBtn">&#9635; Mesa cuadrada</button>
 <button class="btn" id="menuBtn">&#127860; Gestionar menu</button>
+<button class="btn" id="usersBtn">&#128101; Gestionar usuarios</button>
 <span class="hint-bar" id="hintBar"></span>
+</div>
 </div>
 </div>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -171,26 +253,219 @@ floors: [
 {id:'f5', name:'Sotano', tables:[]}
 ],
 activeFloor: 'f1',
-editMode: false,
-menu: []
+menu: [],
+categories: defaultCategories(),
+users: []
 };
+}
+function defaultCategories(){
+return [
+{id: uid('c'), name: 'Comida'},
+{id: uid('c'), name: 'Bebidas'},
+{id: uid('c'), name: 'Postres'}
+];
+}
+function normalizeMenu(obj){
+if(!Array.isArray(obj.categories) || obj.categories.length === 0){
+obj.categories = defaultCategories();
+}
+if(!Array.isArray(obj.menu)) obj.menu = [];
+obj.menu.forEach(function(p){
+if(typeof p.categoryId === 'undefined') p.categoryId = null;
+if(typeof p.image !== 'string') p.image = '';
+});
 }
 function loadLocalState(){
 try{
 const raw = localStorage.getItem(STORAGE_KEY);
 if(raw){
 const parsed = JSON.parse(raw);
-if(!Array.isArray(parsed.menu)) parsed.menu = [];
+if(!Array.isArray(parsed.users)) parsed.users = [];
+normalizeMenu(parsed);
 if(!Array.isArray(parsed.floors) || parsed.floors.length === 0) parsed.floors = defaultState().floors;
+normalizeFloors(parsed.floors);
 if(!parsed.activeFloor) parsed.activeFloor = parsed.floors[0].id;
 return parsed;
 }
 }catch(e){}
 return defaultState();
 }
+function normalizeFloors(floors){
+floors.forEach(function(f){
+if(!Array.isArray(f.tables)) f.tables = [];
+f.tables.forEach(function(t){
+if(!Array.isArray(t.items)) t.items = [];
+t.items.forEach(function(i){ if(typeof i.ready !== 'boolean') i.ready = false; });
+if(typeof t.assignedTo === 'undefined') t.assignedTo = null;
+if(typeof t.dirty !== 'boolean') t.dirty = false;
+});
+});
+return floors;
+}
 let state = loadLocalState();
 function uid(prefix){
 return prefix + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+}
+
+/* ---------- Sesion / roles ---------- */
+let currentUser = null;
+let editMode = false;
+let viewMode = 'floor';
+let pinBuffer = '';
+let lastLoginHadUsers = null;
+const SESSION_KEY = 'autorest_session_v1';
+
+function isAdmin(){ return !!currentUser && currentUser.role === 'admin'; }
+function isMesero(){ return !!currentUser && currentUser.role === 'mesero'; }
+function isCocina(){ return !!currentUser && currentUser.role === 'cocina'; }
+function canOperateTable(table){
+if(isAdmin()) return true;
+if(isMesero()) return table.assignedTo === currentUser.id;
+return false;
+}
+function roleLabel(r){
+return r === 'admin' ? 'Admin' : (r === 'mesero' ? 'Mesero' : 'Cocina');
+}
+function findUserByPin(pin){
+return (state.users || []).find(function(u){ return u.pin === pin; });
+}
+function loadSession(){
+try{
+const raw = sessionStorage.getItem(SESSION_KEY);
+if(raw){
+const id = JSON.parse(raw);
+const u = (state.users || []).find(function(x){ return x.id === id; });
+if(u) return u;
+}
+}catch(e){}
+return null;
+}
+function saveSession(user){
+try{ sessionStorage.setItem(SESSION_KEY, JSON.stringify(user ? user.id : null)); }catch(e){}
+}
+function logout(){
+currentUser = null;
+saveSession(null);
+pinBuffer = '';
+document.getElementById('appRoot').style.display = 'none';
+document.getElementById('loginScreen').style.display = 'flex';
+lastLoginHadUsers = state.users && state.users.length > 0;
+renderLoginScreen();
+}
+function loginAs(user){
+currentUser = user;
+saveSession(user);
+document.getElementById('loginScreen').style.display = 'none';
+document.getElementById('appRoot').style.display = 'block';
+applyRoleUI();
+renderFloors();
+renderCanvas();
+renderKitchenView();
+}
+function updatePinDots(){
+const dots = document.querySelectorAll('#pinDots span');
+dots.forEach(function(d, i){ d.className = i < pinBuffer.length ? 'filled' : ''; });
+}
+function attemptLogin(){
+const u = findUserByPin(pinBuffer);
+const err = document.getElementById('loginErr');
+if(!u){
+if(err) err.textContent = 'PIN incorrecto.';
+pinBuffer = '';
+updatePinDots();
+return;
+}
+loginAs(u);
+}
+function renderLoginScreen(){
+const el = document.getElementById('loginScreen');
+const hasUsers = state.users && state.users.length > 0;
+if(!hasUsers){
+el.innerHTML =
+'<div class="login-box">' +
+'<h1>AutoRest</h1>' +
+'<p>Primer uso: crea el PIN del administrador</p>' +
+'<div class="login-error" id="loginErr"></div>' +
+'<div class="form-row"><label>Tu nombre</label><input type="text" id="setupName" placeholder="Administrador"></div>' +
+'<div class="form-row"><label>PIN (4 digitos)</label><input type="text" id="setupPin" maxlength="4" inputmode="numeric" placeholder="0000"></div>' +
+'<div class="form-row"><label>Confirmar PIN</label><input type="text" id="setupPin2" maxlength="4" inputmode="numeric" placeholder="0000"></div>' +
+'<button class="btn primary" id="setupOk" style="width:100%;">Crear administrador</button>' +
+'</div>';
+document.getElementById('setupOk').onclick = function(){
+const name = document.getElementById('setupName').value.trim() || 'Administrador';
+const pin = document.getElementById('setupPin').value.trim();
+const pin2 = document.getElementById('setupPin2').value.trim();
+const err = document.getElementById('loginErr');
+if(!/^\d{4}$/.test(pin)){ err.textContent = 'El PIN debe tener 4 digitos.'; return; }
+if(pin !== pin2){ err.textContent = 'Los PIN no coinciden.'; return; }
+const admin = {id: uid('u'), name: name, role: 'admin', pin: pin};
+if(!Array.isArray(state.users)) state.users = [];
+state.users.push(admin);
+saveState();
+loginAs(admin);
+};
+return;
+}
+el.innerHTML =
+'<div class="login-box">' +
+'<h1>AutoRest</h1>' +
+'<p>Ingresa tu PIN</p>' +
+'<div class="pin-dots" id="pinDots"><span></span><span></span><span></span><span></span></div>' +
+'<div class="login-error" id="loginErr"></div>' +
+'<div class="pin-pad" id="pinPad"></div>' +
+'</div>';
+pinBuffer = '';
+const pad = document.getElementById('pinPad');
+['1','2','3','4','5','6','7','8','9','','0','del'].forEach(function(k){
+const b = document.createElement('button');
+if(k === ''){ b.style.visibility = 'hidden'; }
+else if(k === 'del'){ b.textContent = '⌫'; b.className = 'wide'; }
+else{ b.textContent = k; }
+b.onclick = function(){
+if(k === 'del'){ pinBuffer = pinBuffer.slice(0, -1); }
+else if(k !== ''){ if(pinBuffer.length < 4) pinBuffer += k; }
+const err = document.getElementById('loginErr');
+if(err) err.textContent = '';
+updatePinDots();
+if(pinBuffer.length === 4) attemptLogin();
+};
+pad.appendChild(b);
+});
+updatePinDots();
+}
+function applyRoleUI(){
+const buildBar = document.getElementById('buildBar');
+const addFloorBtn = document.getElementById('addFloorBtn');
+const kitchenBtn = document.getElementById('kitchenToggleBtn');
+const chip = document.getElementById('userChip');
+chip.style.display = 'flex';
+chip.innerHTML = escapeHtml(currentUser.name) + ' <span class="role-badge ' + currentUser.role + '">' + roleLabel(currentUser.role) + '</span> <button id="logoutBtn">Salir</button>';
+document.getElementById('logoutBtn').onclick = logout;
+
+if(isAdmin()){
+buildBar.style.display = 'block';
+addFloorBtn.style.display = 'inline-block';
+kitchenBtn.style.display = 'inline-block';
+kitchenBtn.textContent = '🍳 Cocina';
+setViewMode('floor');
+}else if(isCocina()){
+buildBar.style.display = 'none';
+addFloorBtn.style.display = 'none';
+kitchenBtn.style.display = 'none';
+setViewMode('kitchen');
+}else{
+buildBar.style.display = 'none';
+addFloorBtn.style.display = 'none';
+kitchenBtn.style.display = 'none';
+setViewMode('floor');
+}
+}
+function setViewMode(mode){
+viewMode = mode;
+document.getElementById('canvas').style.display = mode === 'floor' ? 'block' : 'none';
+document.getElementById('kitchenView').style.display = mode === 'kitchen' ? 'flex' : 'none';
+document.getElementById('floorsContainer').style.display = mode === 'floor' ? 'flex' : 'none';
+if(mode === 'kitchen') renderKitchenView();
 }
 
 /* ---------- Firebase realtime sync (en vivo para todos) ---------- */
@@ -208,32 +483,64 @@ let dbRef = null;
 let firebaseBootstrapped = false;
 let pendingRemoteState = null;
 
+let connectionStatus = 'connecting';
 function setLive(status){
+connectionStatus = status;
+refreshLiveIndicator();
+}
+function getTablesNeedingAssistance(){
+const list = [];
+(state.floors || []).forEach(function(floor){
+floor.tables.forEach(function(table){
+if(table.assistance){ list.push(table); }
+});
+});
+return list;
+}
+function refreshLiveIndicator(){
 var dot = document.getElementById('liveDot');
 var text = document.getElementById('liveText');
-if(!dot || !text) return;
-if(status === 'on'){ dot.className = 'live-dot on'; text.textContent = 'En vivo - todos sincronizados'; }
-else if(status === 'off'){ dot.className = 'live-dot off'; text.textContent = 'Sin conexion'; }
+var wrap = document.getElementById('liveIndicator');
+if(!dot || !text || !wrap) return;
+const needing = getTablesNeedingAssistance();
+if(needing.length > 0){
+dot.className = 'live-dot off';
+wrap.classList.add('alert');
+const names = needing.map(function(t){ return t.label; }).join(', ');
+text.textContent = '🔔 ' + (needing.length === 1 ? 'Mesa ' + names + ' solicita asistencia' : 'Mesas ' + names + ' solicitan asistencia');
+return;
+}
+wrap.classList.remove('alert');
+if(connectionStatus === 'on'){ dot.className = 'live-dot on'; text.textContent = 'En vivo - todos sincronizados'; }
+else if(connectionStatus === 'off'){ dot.className = 'live-dot off'; text.textContent = 'Sin conexion'; }
 else { dot.className = 'live-dot'; text.textContent = 'Conectando...'; }
 }
 function isAnyModalOpen(){
 return !!document.querySelector('.modal-overlay');
 }
-function syncEditModeUI(){
-var chk = document.getElementById('editModeChk');
-if(chk){ chk.checked = !!state.editMode; }
-if(typeof updateHint === 'function') updateHint();
-}
 function applyRemoteState(val){
 if(!val || typeof val !== 'object') return;
-if(!Array.isArray(val.menu)) val.menu = [];
+if(!Array.isArray(val.users)) val.users = [];
+normalizeMenu(val);
 if(!Array.isArray(val.floors) || val.floors.length === 0) val.floors = defaultState().floors;
+normalizeFloors(val.floors);
 if(!val.activeFloor) val.activeFloor = val.floors[0].id;
 state = val;
 try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+if(currentUser){
+const stillExists = state.users.find(function(u){ return u.id === currentUser.id; });
+if(!stillExists){ logout(); return; }
+currentUser = stillExists;
 renderFloors();
 renderCanvas();
-syncEditModeUI();
+renderKitchenView();
+}else{
+const hasUsersNow = state.users && state.users.length > 0;
+if(hasUsersNow !== lastLoginHadUsers){
+lastLoginHadUsers = hasUsersNow;
+renderLoginScreen();
+}
+}
 }
 const modalObserver = new MutationObserver(function(){
 if(!isAnyModalOpen() && pendingRemoteState){
@@ -287,6 +594,24 @@ if(m === '>') return '&gt;';
 if(m === '"') return '&quot;';
 return '&#39;';
 });
+}
+function resizeImageToDataUrl(file, callback){
+const reader = new FileReader();
+reader.onload = function(e){
+const img = new Image();
+img.onload = function(){
+const maxDim = 240;
+let w = img.width, h = img.height;
+if(w > h){ if(w > maxDim){ h = Math.round(h * maxDim / w); w = maxDim; } }
+else{ if(h > maxDim){ w = Math.round(w * maxDim / h); h = maxDim; } }
+const canvas = document.createElement('canvas');
+canvas.width = w; canvas.height = h;
+canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+callback(canvas.toDataURL('image/jpeg', 0.72));
+};
+img.src = e.target.result;
+};
+reader.readAsDataURL(file);
 }
 function showPrompt(title, defaultValue, onOk){
 const overlay = document.createElement('div');
@@ -351,6 +676,7 @@ nameSpan.textContent = floor.name;
 nameSpan.onclick = function(){ state.activeFloor = floor.id; saveState(); renderFloors(); renderCanvas(); };
 tab.appendChild(nameSpan);
 
+if(isAdmin()){
 const editBtn = document.createElement('span');
 editBtn.className = 'mini-btn';
 editBtn.textContent = 'Ren';
@@ -377,11 +703,13 @@ saveState(); renderFloors(); renderCanvas();
 });
 };
 tab.appendChild(delBtn);
+}
 
 floorsContainer.appendChild(tab);
 });
 }
 document.getElementById('addFloorBtn').onclick = function(){
+if(!isAdmin()) return;
 showPrompt('Nombre del nuevo piso', '', function(name){
 if(name && name.trim()){
 const f = {id:uid('f'), name:name.trim(), tables:[]};
@@ -412,7 +740,7 @@ canvas.appendChild(hint);
 }
 floor.tables.forEach(function(table){
 const el = document.createElement('div');
-el.className = 'table-el ' + table.shape + (table.assistance ? ' blink' : '');
+el.className = 'table-el ' + table.shape + (table.assistance ? ' blink' : '') + (table.dirty ? ' dirty' : '');
 el.style.left = table.x + 'px';
 el.style.top = table.y + 'px';
 el.style.width = table.size + 'px';
@@ -421,31 +749,79 @@ el.style.background = fillStyleToCss(table.color, table.fillStyle);
 el.textContent = table.label;
 
 const occupied = table.items && table.items.length > 0;
+const allReady = occupied && table.items.every(function(i){ return i.ready; });
 const dot = document.createElement('div');
 dot.className = 'status-dot';
-dot.style.background = occupied ? 'var(--occupied)' : 'var(--free)';
-dot.style.boxShadow = occupied ? '0 0 8px 2px rgba(255,179,71,0.7)' : '0 0 8px 2px rgba(45,255,176,0.7)';
+if(table.dirty){
+dot.style.background = 'var(--dirty)';
+dot.style.boxShadow = '0 0 8px 2px rgba(156,163,196,0.7)';
+}else if(!occupied){
+dot.style.background = 'var(--free)';
+dot.style.boxShadow = '0 0 8px 2px rgba(45,255,176,0.7)';
+}else if(allReady){
+dot.style.background = 'var(--accent2)';
+dot.style.boxShadow = '0 0 8px 2px rgba(34,211,238,0.7)';
+}else{
+dot.style.background = 'var(--occupied)';
+dot.style.boxShadow = '0 0 8px 2px rgba(255,179,71,0.7)';
+}
 el.appendChild(dot);
 
+if(table.dirty){
+const tag = document.createElement('div');
+tag.className = 'clean-tag';
+tag.textContent = '🧹 Aseo';
+el.appendChild(tag);
+}
+
+if(table.assignedTo && !table.dirty){
+const u = (state.users || []).find(function(x){ return x.id === table.assignedTo; });
+if(u){
+const tag = document.createElement('div');
+tag.className = 'assign-tag';
+tag.textContent = u.name;
+el.appendChild(tag);
+}
+}
+
+if(!table.dirty){
 const bell = document.createElement('div');
 bell.className = 'bell' + (table.assistance ? ' active' : '');
 bell.textContent = String.fromCodePoint(128276);
 bell.title = 'Solicitar o cancelar asistencia';
 bell.onclick = function(e){
 e.stopPropagation();
+if(!canOperateTable(table)){ showAlert('No puedes modificar esta mesa.'); return; }
 table.assistance = !table.assistance;
 saveState(); renderCanvas();
 };
 el.appendChild(bell);
+}
 
 el.onclick = function(e){
 if(dragged){ dragged = false; return; }
-if(state.editMode){ openEditModal(table, floor); }
-else{ openOrderModal(table, floor); }
+if(isAdmin() && editMode){ openEditModal(table, floor); return; }
+if(table.dirty){ openCleaningModal(table, floor); return; }
+if(isAdmin()){ openOrderModal(table, floor); return; }
+if(isMesero()){
+if(!table.assignedTo){
+showConfirm('Atender la mesa ' + table.label + '?', function(){
+table.assignedTo = currentUser.id;
+saveState();
+renderCanvas();
+openOrderModal(table, floor);
+});
+return;
+}
+if(table.assignedTo === currentUser.id){ openOrderModal(table, floor); return; }
+openReadOnlyModal(table, floor);
+return;
+}
+openReadOnlyModal(table, floor);
 };
 
 el.addEventListener('pointerdown', function(e){
-if(!state.editMode) return;
+if(!isAdmin() || !editMode) return;
 if(e.pointerType === 'mouse' && e.button !== 0) return;
 e.preventDefault();
 const pointerId = e.pointerId;
@@ -477,23 +853,26 @@ el.addEventListener('pointercancel', onUp);
 
 canvas.appendChild(el);
 });
+refreshLiveIndicator();
 }
 
 const buildToggle = document.getElementById('buildToggle');
 const buildPanel = document.getElementById('buildPanel');
 buildToggle.onclick = function(){ buildPanel.classList.toggle('open'); };
 const editModeChk = document.getElementById('editModeChk');
-editModeChk.checked = state.editMode;
+editModeChk.checked = false;
 function updateHint(){
-document.getElementById('hintBar').textContent = state.editMode ? 'Arrastra las mesas para moverlas. Haz clic en una mesa para editar sus propiedades.' : '';
+document.getElementById('hintBar').textContent = editMode ? 'Arrastra las mesas para moverlas. Haz clic en una mesa para editar sus propiedades.' : '';
 }
 editModeChk.onchange = function(){
-state.editMode = editModeChk.checked;
+if(!isAdmin()) return;
+editMode = editModeChk.checked;
 updateHint();
-saveState();
+renderCanvas();
 };
 updateHint();
 function addTable(shape){
+if(!isAdmin()) return;
 const floor = getActiveFloor();
 showPrompt('Nombre o numero de la mesa', String(floor.tables.length + 1), function(label){
 const table = {
@@ -508,10 +887,12 @@ fillStyle: 'solid',
 items: [],
 tipPercent: 10,
 tipEnabled: true,
-assistance: false
+assistance: false,
+assignedTo: null,
+dirty: false
 };
 floor.tables.push(table);
-state.editMode = true;
+editMode = true;
 editModeChk.checked = true;
 updateHint();
 saveState();
@@ -520,10 +901,25 @@ renderCanvas();
 }
 document.getElementById('addCircleBtn').onclick = function(){ addTable('circle'); };
 document.getElementById('addSquareBtn').onclick = function(){ addTable('square'); };
-document.getElementById('menuBtn').onclick = function(){ openMenuModal(); };
+document.getElementById('menuBtn').onclick = function(){ if(isAdmin()) openMenuModal(); };
+document.getElementById('usersBtn').onclick = function(){ if(isAdmin()) openUsersModal(); };
+document.getElementById('kitchenToggleBtn').onclick = function(){
+if(!isAdmin()) return;
+setViewMode(viewMode === 'floor' ? 'kitchen' : 'floor');
+document.getElementById('kitchenToggleBtn').textContent = viewMode === 'floor' ? '🍳 Cocina' : '🗺️ Piso';
+};
 const PRESET_COLORS = ['#4f46e5','#0ea5e9','#22c55e','#f59e0b','#ef4444','#a855f7','#14b8a6','#64748b'];
 
+function assignOptionsHtml(table){
+let html = '<option value=""' + (!table.assignedTo ? ' selected' : '') + '>Sin asignar</option>';
+(state.users || []).filter(function(u){ return u.role === 'mesero'; }).forEach(function(u){
+html += '<option value="' + u.id + '"' + (table.assignedTo === u.id ? ' selected' : '') + '>' + escapeHtml(u.name) + '</option>';
+});
+return html;
+}
+
 function openEditModal(table, floor){
+if(!isAdmin()) return;
 const overlay = document.createElement('div');
 overlay.className = 'modal-overlay';
 let presetsHtml = '';
@@ -552,6 +948,8 @@ overlay.innerHTML =
 '<option value="striped"' + (table.fillStyle === 'striped' ? ' selected' : '') + '>Rayado</option>' +
 '<option value="dotted"' + (table.fillStyle === 'dotted' ? ' selected' : '') + '>Punteado</option>' +
 '</select></div>' +
+'<div class="form-row"><label>Mesero asignado</label>' +
+'<select id="edtAssign">' + assignOptionsHtml(table) + '</select></div>' +
 '<div style="display:flex;gap:8px;margin-top:14px;">' +
 '<button class="btn primary" id="saveEdt">Guardar cambios</button>' +
 '<button class="btn danger" id="delTable">Eliminar</button>' +
@@ -572,6 +970,7 @@ table.shape = overlay.querySelector('#edtShape').value;
 table.size = parseInt(overlay.querySelector('#edtSize').value, 10);
 table.color = overlay.querySelector('#edtColor').value;
 table.fillStyle = overlay.querySelector('#edtFill').value;
+table.assignedTo = overlay.querySelector('#edtAssign').value || null;
 saveState();
 renderCanvas();
 overlay.remove();
@@ -586,23 +985,140 @@ overlay.remove();
 };
 }
 
+function categoryName(categoryId){
+const c = state.categories.find(function(x){ return x.id === categoryId; });
+return c ? c.name : 'Sin categoria';
+}
+
+function openProductModal(prod, onDone){
+const isNew = !prod;
+const overlay = document.createElement('div');
+overlay.className = 'modal-overlay';
+let pendingImage = prod ? prod.image : '';
+let catOptions = '<option value="">Sin categoria</option>';
+state.categories.forEach(function(c){
+catOptions += '<option value="' + c.id + '"' + (prod && prod.categoryId === c.id ? ' selected' : '') + '>' + escapeHtml(c.name) + '</option>';
+});
+overlay.innerHTML =
+'<div class="modal">' +
+'<h2>' + (isNew ? 'Nuevo producto' : 'Editar producto') + ' <span class="close-x">&times;</span></h2>' +
+'<div class="img-upload-row">' +
+'<div class="img-preview" id="prodImgPreview">' + (pendingImage ? '<img src="' + pendingImage + '">' : '🍽️') + '</div>' +
+'<input type="file" id="prodImgInput" accept="image/*">' +
+'</div>' +
+'<div class="form-row"><label>Nombre</label><input type="text" id="prodName" value="' + escapeHtml(prod ? prod.name : '') + '"></div>' +
+'<div class="form-row"><label>Valor</label><input type="number" min="0" step="0.01" id="prodPrice" value="' + (prod ? prod.price : '') + '"></div>' +
+'<div class="form-row"><label>Categoria</label><select id="prodCategory">' + catOptions + '</select></div>' +
+'<div style="display:flex;gap:8px;margin-top:10px;">' +
+'<button class="btn primary" id="prodSaveBtn" style="flex:1;">Guardar</button>' +
+(isNew ? '' : '<button class="btn danger" id="prodDelBtn">Eliminar</button>') +
+'</div>' +
+'</div>';
+document.body.appendChild(overlay);
+overlay.querySelector('.close-x').onclick = function(){ overlay.remove(); };
+overlay.addEventListener('click', function(e){ if(e.target === overlay) overlay.remove(); });
+overlay.querySelector('#prodImgInput').addEventListener('change', function(e){
+const file = e.target.files[0];
+if(!file) return;
+resizeImageToDataUrl(file, function(dataUrl){
+pendingImage = dataUrl;
+overlay.querySelector('#prodImgPreview').innerHTML = '<img src="' + dataUrl + '">';
+});
+});
+overlay.querySelector('#prodSaveBtn').onclick = function(){
+const name = overlay.querySelector('#prodName').value.trim();
+const price = parseFloat(overlay.querySelector('#prodPrice').value);
+const categoryId = overlay.querySelector('#prodCategory').value || null;
+if(!name || isNaN(price) || price < 0){ showAlert('Ingresa un nombre y un valor valido.'); return; }
+if(isNew){
+state.menu.push({id: uid('m'), name: name, price: price, categoryId: categoryId, image: pendingImage});
+}else{
+prod.name = name;
+prod.price = price;
+prod.categoryId = categoryId;
+prod.image = pendingImage;
+}
+saveState();
+overlay.remove();
+if(onDone) onDone();
+};
+if(!isNew){
+overlay.querySelector('#prodDelBtn').onclick = function(){
+showConfirm('Eliminar "' + prod.name + '" del menu?', function(){
+state.menu = state.menu.filter(function(p){ return p.id !== prod.id; });
+saveState();
+overlay.remove();
+if(onDone) onDone();
+});
+};
+}
+}
+
 function openMenuModal(){
+if(!isAdmin()) return;
 const overlay = document.createElement('div');
 overlay.className = 'modal-overlay';
 overlay.innerHTML =
 '<div class="modal">' +
 '<h2>Gestionar menu <span class="close-x">&times;</span></h2>' +
-'<p style="margin-top:-6px;">Agrega los productos disponibles con su nombre y valor. Luego podras seleccionarlos desde cada mesa.</p>' +
+'<div class="form-row"><label>Categorias</label>' +
+'<div class="cat-tag-row" id="catTagRow"></div>' +
+'<div style="display:flex;gap:6px;">' +
+'<input type="text" id="newCatName" placeholder="Nueva categoria" style="flex:1;padding:8px;border:1px solid var(--border-soft);border-radius:8px;background:rgba(255,255,255,0.04);color:var(--text);">' +
+'<button class="btn" id="addCatBtn">+</button>' +
+'</div></div>' +
 '<div id="menuItemsList"></div>' +
-'<div style="display:flex;gap:6px;margin-top:10px;">' +
-'<input type="text" id="newMenuName" placeholder="Nombre del producto" style="flex:2;padding:8px;border:1px solid var(--border-soft);border-radius:8px;background:rgba(255,255,255,0.04);color:var(--text);">' +
-'<input type="number" id="newMenuPrice" placeholder="Valor" min="0" step="0.01" style="flex:1;padding:8px;border:1px solid var(--border-soft);border-radius:8px;background:rgba(255,255,255,0.04);color:var(--text);">' +
-'<button class="btn primary" id="addMenuItemBtn">+</button>' +
-'</div>' +
+'<button class="btn primary" id="addProductBtn" style="width:100%;margin-top:10px;">+ Nuevo producto</button>' +
 '</div>';
 document.body.appendChild(overlay);
 overlay.querySelector('.close-x').onclick = function(){ overlay.remove(); renderCanvas(); };
 overlay.addEventListener('click', function(e){ if(e.target === overlay){ overlay.remove(); renderCanvas(); } });
+function renderCatTags(){
+const wrap = overlay.querySelector('#catTagRow');
+wrap.innerHTML = '';
+if(state.categories.length === 0){
+wrap.innerHTML = '<div style="font-size:12px;color:#8993b8;">Sin categorias.</div>';
+}
+state.categories.forEach(function(c){
+const chip = document.createElement('div');
+chip.className = 'cat-chip';
+const nameSpan = document.createElement('span');
+nameSpan.textContent = c.name;
+nameSpan.onclick = function(){
+showPrompt('Nombre de la categoria', c.name, function(nn){
+if(!nn || !nn.trim()) return;
+c.name = nn.trim();
+saveState();
+renderCatTags();
+renderMenuItems();
+});
+};
+chip.appendChild(nameSpan);
+const delBtn = document.createElement('button');
+delBtn.textContent = '×';
+delBtn.title = 'Eliminar categoria';
+delBtn.onclick = function(){
+showConfirm('Eliminar la categoria "' + c.name + '"? Los productos en ella quedaran sin categoria.', function(){
+state.categories = state.categories.filter(function(x){ return x.id !== c.id; });
+state.menu.forEach(function(p){ if(p.categoryId === c.id) p.categoryId = null; });
+saveState();
+renderCatTags();
+renderMenuItems();
+});
+};
+chip.appendChild(delBtn);
+wrap.appendChild(chip);
+});
+}
+overlay.querySelector('#addCatBtn').onclick = function(){
+const inp = overlay.querySelector('#newCatName');
+const name = inp.value.trim();
+if(!name){ return; }
+state.categories.push({id: uid('c'), name: name});
+saveState();
+inp.value = '';
+renderCatTags();
+};
 function renderMenuItems(){
 const list = overlay.querySelector('#menuItemsList');
 list.innerHTML = '';
@@ -613,61 +1129,182 @@ return;
 state.menu.forEach(function(prod){
 const row = document.createElement('div');
 row.className = 'item-row';
+const left = document.createElement('span');
+left.className = 'name menu-item-row-admin';
+const thumb = document.createElement('div');
+thumb.className = 'thumb-sm';
+thumb.innerHTML = prod.image ? '<img src="' + prod.image + '">' : '🍽️';
+left.appendChild(thumb);
+const textWrap = document.createElement('span');
+textWrap.innerHTML = escapeHtml(prod.name) + '<br><small style="color:#8993b8;">' + escapeHtml(categoryName(prod.categoryId)) + ' · valor ' + prod.price.toFixed(2) + '</small>';
+left.appendChild(textWrap);
+row.appendChild(left);
+const editBtn = document.createElement('button');
+editBtn.className = 'qty-btn';
+editBtn.title = 'Editar';
+editBtn.innerHTML = '&#9998;';
+editBtn.onclick = function(){ openProductModal(prod, function(){ renderMenuItems(); }); };
+row.appendChild(editBtn);
+list.appendChild(row);
+});
+}
+overlay.querySelector('#addProductBtn').onclick = function(){
+openProductModal(null, function(){ renderMenuItems(); });
+};
+renderCatTags();
+renderMenuItems();
+}
+
+function openUsersModal(){
+if(!isAdmin()) return;
+const overlay = document.createElement('div');
+overlay.className = 'modal-overlay';
+overlay.innerHTML =
+'<div class="modal">' +
+'<h2>Gestionar usuarios <span class="close-x">&times;</span></h2>' +
+'<p style="margin-top:-6px;">Crea un PIN de 4 digitos para cada mesero o persona de cocina.</p>' +
+'<div id="usersList"></div>' +
+'<div class="form-row" style="margin-top:10px;"><label>Nombre</label><input type="text" id="newUserName" placeholder="Nombre"></div>' +
+'<div class="form-row"><label>Rol</label><select id="newUserRole"><option value="mesero">Mesero</option><option value="cocina">Cocina</option><option value="admin">Administrador</option></select></div>' +
+'<div class="form-row"><label>PIN (4 digitos)</label><input type="text" id="newUserPin" maxlength="4" inputmode="numeric" placeholder="0000"></div>' +
+'<button class="btn primary" id="addUserBtn" style="width:100%;">Agregar usuario</button>' +
+'</div>';
+document.body.appendChild(overlay);
+overlay.querySelector('.close-x').onclick = function(){ overlay.remove(); };
+overlay.addEventListener('click', function(e){ if(e.target === overlay) overlay.remove(); });
+function renderUsersList(){
+const list = overlay.querySelector('#usersList');
+list.innerHTML = '';
+if(!state.users || state.users.length === 0){
+list.innerHTML = '<div style="font-size:12px;color:#8993b8;padding:6px 0;">Aun no hay usuarios.</div>';
+return;
+}
+state.users.forEach(function(u){
+const row = document.createElement('div');
+row.className = 'item-row';
 row.innerHTML =
-'<span class="name">' + escapeHtml(prod.name) + '<br><small style="color:#8993b8;">valor ' + prod.price.toFixed(2) + '</small></span>' +
+'<span class="name">' + escapeHtml(u.name) + ' <span class="role-badge ' + u.role + '">' + roleLabel(u.role) + '</span><br><small style="color:#8993b8;">PIN ' + escapeHtml(u.pin) + '</small></span>' +
 '<button class="qty-btn" data-act="edit" title="Editar">&#9998;</button>' +
 '<button class="qty-btn" data-act="del" title="Eliminar">&times;</button>';
 row.querySelector('[data-act="edit"]').onclick = function(){
-showPrompt('Nombre del producto', prod.name, function(nn){
+showPrompt('Nombre', u.name, function(nn){
 if(!nn || !nn.trim()) return;
-prod.name = nn.trim();
-showPrompt('Valor del producto', String(prod.price), function(np){
-const val = parseFloat(np);
-if(!isNaN(val) && val >= 0) prod.price = val;
+u.name = nn.trim();
+showPrompt('Nuevo PIN (4 digitos)', u.pin, function(np){
+if(!/^\d{4}$/.test(np)){ showAlert('El PIN debe tener 4 digitos.'); return; }
+const clash = state.users.find(function(x){ return x.pin === np && x.id !== u.id; });
+if(clash){ showAlert('Ese PIN ya esta en uso.'); return; }
+u.pin = np;
 saveState();
-renderMenuItems();
+renderUsersList();
 });
 });
 };
 row.querySelector('[data-act="del"]').onclick = function(){
-showConfirm('Eliminar "' + prod.name + '" del menu?', function(){
-state.menu = state.menu.filter(function(p){ return p.id !== prod.id; });
+const admins = state.users.filter(function(x){ return x.role === 'admin'; });
+if(u.role === 'admin' && admins.length <= 1){ showAlert('Debe existir al menos un administrador.'); return; }
+showConfirm('Eliminar a ' + u.name + '?', function(){
+state.users = state.users.filter(function(x){ return x.id !== u.id; });
+state.floors.forEach(function(f){
+f.tables.forEach(function(t){ if(t.assignedTo === u.id) t.assignedTo = null; });
+});
 saveState();
-renderMenuItems();
+renderUsersList();
+renderCanvas();
 });
 };
 list.appendChild(row);
 });
 }
-overlay.querySelector('#addMenuItemBtn').onclick = function(){
-const nameInp = overlay.querySelector('#newMenuName');
-const priceInp = overlay.querySelector('#newMenuPrice');
-const name = nameInp.value.trim();
-const price = parseFloat(priceInp.value);
-if(!name || isNaN(price) || price < 0){ showAlert('Ingresa un nombre y un valor valido.'); return; }
-state.menu.push({id: uid('m'), name: name, price: price});
+overlay.querySelector('#addUserBtn').onclick = function(){
+const name = overlay.querySelector('#newUserName').value.trim();
+const role = overlay.querySelector('#newUserRole').value;
+const pin = overlay.querySelector('#newUserPin').value.trim();
+if(!name){ showAlert('Ingresa un nombre.'); return; }
+if(!/^\d{4}$/.test(pin)){ showAlert('El PIN debe tener 4 digitos.'); return; }
+if(!Array.isArray(state.users)) state.users = [];
+if(state.users.find(function(x){ return x.pin === pin; })){ showAlert('Ese PIN ya esta en uso.'); return; }
+state.users.push({id: uid('u'), name: name, role: role, pin: pin});
 saveState();
-nameInp.value = '';
-priceInp.value = '';
-renderMenuItems();
+overlay.querySelector('#newUserName').value = '';
+overlay.querySelector('#newUserPin').value = '';
+renderUsersList();
 };
-renderMenuItems();
+renderUsersList();
 }
 
-function openOrderModal(table, floor){
+function openCleaningModal(table, floor){
 const overlay = document.createElement('div');
 overlay.className = 'modal-overlay';
 overlay.innerHTML =
+'<div class="modal" style="width:300px;text-align:center;">' +
+'<h2>Mesa ' + escapeHtml(table.label) + ' <span class="close-x">&times;</span></h2>' +
+'<p>🧹 Esta mesa requiere aseo antes de recibir nuevos clientes.</p>' +
+'<button class="btn primary" id="markCleanBtn" style="width:100%;">Marcar como limpia</button>' +
+'</div>';
+document.body.appendChild(overlay);
+overlay.querySelector('.close-x').onclick = function(){ overlay.remove(); };
+overlay.addEventListener('click', function(e){ if(e.target === overlay) overlay.remove(); });
+overlay.querySelector('#markCleanBtn').onclick = function(){
+table.dirty = false;
+saveState();
+renderCanvas();
+overlay.remove();
+};
+}
+
+function openReadOnlyModal(table, floor){
+const overlay = document.createElement('div');
+overlay.className = 'modal-overlay';
+const assignedUser = (state.users || []).find(function(u){ return u.id === table.assignedTo; });
+let itemsHtml = '';
+if(!table.items || table.items.length === 0){
+itemsHtml = '<div style="font-size:12px;color:#8993b8;padding:6px 0;">Sin productos aun.</div>';
+}else{
+table.items.forEach(function(item){
+itemsHtml += '<div class="item-row"><span class="name">' + escapeHtml(item.name) + ' x' + item.qty +
+'</span><span>' + (item.ready ? '✓' : '⏳') + '</span><span>' + (item.price * item.qty).toFixed(2) + '</span></div>';
+});
+}
+const subtotal = (table.items || []).reduce(function(s, i){ return s + i.price * i.qty; }, 0);
+overlay.innerHTML =
 '<div class="modal">' +
 '<h2>Mesa ' + escapeHtml(table.label) + ' <span class="close-x">&times;</span></h2>' +
+'<div class="readonly-note">Solo lectura. ' + (assignedUser ? 'Atendida por ' + escapeHtml(assignedUser.name) + '.' : 'Sin mesero asignado.') + '</div>' +
+itemsHtml +
+'<div class="totals"><div class="row grand"><span>Subtotal</span><span>' + subtotal.toFixed(2) + '</span></div></div>' +
+'</div>';
+document.body.appendChild(overlay);
+overlay.querySelector('.close-x').onclick = function(){ overlay.remove(); };
+overlay.addEventListener('click', function(e){ if(e.target === overlay) overlay.remove(); });
+}
+
+function openOrderModal(table, floor){
+if(!canOperateTable(table)){ openReadOnlyModal(table, floor); return; }
+const overlay = document.createElement('div');
+overlay.className = 'modal-overlay';
+const assignedUser = (state.users || []).find(function(u){ return u.id === table.assignedTo; });
+let presetsHtml = '';
+PRESET_COLORS.forEach(function(c){
+presetsHtml += '<span style="background:' + c + '" data-color="' + c + '"></span>';
+});
+overlay.innerHTML =
+'<div class="modal">' +
+'<h2>Mesa ' + escapeHtml(table.label) + ' <span class="close-x">&times;</span></h2>' +
+(isMesero() ? '' : '<p style="margin-top:-6px;font-size:12px;color:var(--muted);">' + (assignedUser ? 'Atendida por: ' + escapeHtml(assignedUser.name) : 'Sin mesero asignado') + '</p>') +
+'<div class="mini-color-row" id="miniColorRow">' + presetsHtml + '</div>' +
 '<div class="assist-row"><span id="assistText"></span>' +
 '<button class="btn" id="toggleAssist"></button></div>' +
-'<div id="itemsList"></div>' +
-'<div style="display:flex;gap:6px;margin-top:8px;">' +
-'<select id="menuItemSelect" style="flex:2;padding:8px;border:1px solid var(--border-soft);border-radius:8px;background:rgba(255,255,255,0.04);color:var(--text);"></select>' +
-'<button class="btn primary" id="addItemBtn">Agregar</button>' +
+'<div class="cat-tiles-grid" id="catTilesGrid"></div>' +
+'<div id="productsView" style="display:none;">' +
+'<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">' +
+'<button class="btn" id="backToCatsBtn">‹ Categorias</button>' +
+'<strong id="currentCatLabel" style="font-size:13px;"></strong>' +
 '</div>' +
-'<div class="hint-bar" id="noMenuHint" style="margin-top:4px;"></div>' +
+'<div class="catalog-grid" id="catalogGrid"></div>' +
+'</div>' +
+'<label style="display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:600;">Pedido actual</label>' +
+'<div id="itemsList"></div>' +
 '<div class="totals">' +
 '<div class="row"><span>Subtotal</span><span id="subtotalVal">0.00</span></div>' +
 '<div class="row"><label><input type="checkbox" id="tipEnabled"> Propina</label>' +
@@ -680,6 +1317,13 @@ overlay.innerHTML =
 '</div>' +
 '</div>';
 document.body.appendChild(overlay);
+overlay.querySelectorAll('#miniColorRow span').forEach(function(sw){
+sw.onclick = function(){
+table.color = sw.getAttribute('data-color');
+saveState();
+renderCanvas();
+};
+});
 function updateAssistUI(){
 overlay.querySelector('#assistText').textContent = table.assistance ? 'Esta mesa solicito asistencia' : 'Sin solicitud de asistencia';
 overlay.querySelector('#toggleAssist').textContent = table.assistance ? 'Marcar atendida' : 'Solicitar asistencia';
@@ -697,26 +1341,83 @@ const tipEnabledChk = overlay.querySelector('#tipEnabled');
 const tipPercentInp = overlay.querySelector('#tipPercent');
 tipEnabledChk.checked = table.tipEnabled;
 tipPercentInp.value = table.tipPercent;
-const menuSelect = overlay.querySelector('#menuItemSelect');
-const addItemBtn = overlay.querySelector('#addItemBtn');
-const noMenuHint = overlay.querySelector('#noMenuHint');
-function populateMenuSelect(){
-menuSelect.innerHTML = '';
+let catalogView = 'categories';
+let catalogFilter = null;
+function addProductToOrder(prod){
+const existing = table.items.find(function(i){ return i.name === prod.name && i.price === prod.price && !i.ready; });
+if(existing){ existing.qty++; }
+else{ table.items.push({id: uid('i'), name: prod.name, price: prod.price, qty: 1, ready: false}); }
+refresh();
+}
+function productsInCategory(catId){
+return state.menu.filter(function(p){ return catId === 'none' ? !p.categoryId : p.categoryId === catId; });
+}
+function buildCatTile(catId, name){
+const tile = document.createElement('div');
+tile.className = 'cat-tile';
+const icon = document.createElement('div');
+icon.className = 'cat-icon';
+const withImg = productsInCategory(catId).find(function(p){ return p.image; });
+icon.innerHTML = withImg ? '<img src="' + withImg.image + '">' : '🍽️';
+tile.appendChild(icon);
+const nm = document.createElement('div');
+nm.className = 'cat-name';
+nm.textContent = name;
+tile.appendChild(nm);
+tile.onclick = function(){ catalogFilter = catId; catalogView = 'products'; renderCatalogNav(); };
+return tile;
+}
+function renderCatTiles(){
+const wrap = overlay.querySelector('#catTilesGrid');
+wrap.innerHTML = '';
 if(state.menu.length === 0){
-addItemBtn.disabled = true;
-noMenuHint.textContent = 'No hay productos configurados. Usa el menu de construccion (abajo) > Gestionar menu para agregarlos.';
+wrap.innerHTML = '<div class="catalog-empty">No hay productos configurados. Pide al administrador que los agregue desde Gestionar menu.</div>';
 return;
 }
-addItemBtn.disabled = false;
-noMenuHint.textContent = '';
-state.menu.forEach(function(prod){
-const opt = document.createElement('option');
-opt.value = prod.id;
-opt.textContent = prod.name + ' - ' + prod.price.toFixed(2);
-menuSelect.appendChild(opt);
+state.categories.forEach(function(c){ wrap.appendChild(buildCatTile(c.id, c.name)); });
+if(state.menu.some(function(p){ return !p.categoryId; })){
+wrap.appendChild(buildCatTile('none', 'Sin categoria'));
+}
+}
+function renderCatalogGrid(){
+const grid = overlay.querySelector('#catalogGrid');
+grid.innerHTML = '';
+const items = productsInCategory(catalogFilter);
+if(items.length === 0){
+grid.innerHTML = '<div class="catalog-empty">No hay productos en esta categoria.</div>';
+return;
+}
+items.forEach(function(prod){
+const card = document.createElement('div');
+card.className = 'catalog-card';
+const thumb = document.createElement('div');
+thumb.className = 'thumb';
+thumb.innerHTML = prod.image ? '<img src="' + prod.image + '">' : '🍽️';
+card.appendChild(thumb);
+const info = document.createElement('div');
+info.className = 'info';
+info.innerHTML = '<div class="pname">' + escapeHtml(prod.name) + '</div><div class="pprice">' + prod.price.toFixed(2) + '</div>';
+card.appendChild(info);
+card.onclick = function(){ addProductToOrder(prod); };
+grid.appendChild(card);
 });
 }
-populateMenuSelect();
+function renderCatalogNav(){
+const tilesWrap = overlay.querySelector('#catTilesGrid');
+const productsWrap = overlay.querySelector('#productsView');
+if(catalogView === 'categories'){
+tilesWrap.style.display = 'grid';
+productsWrap.style.display = 'none';
+renderCatTiles();
+}else{
+tilesWrap.style.display = 'none';
+productsWrap.style.display = 'block';
+overlay.querySelector('#currentCatLabel').textContent = catalogFilter === 'none' ? 'Sin categoria' : categoryName(catalogFilter);
+renderCatalogGrid();
+}
+}
+overlay.querySelector('#backToCatsBtn').onclick = function(){ catalogView = 'categories'; renderCatalogNav(); };
+renderCatalogNav();
 function renderItems(){
 const list = overlay.querySelector('#itemsList');
 list.innerHTML = '';
@@ -728,8 +1429,10 @@ const row = document.createElement('div');
 row.className = 'item-row';
 const priceEach = item.price.toFixed(2);
 const lineTotal = (item.price * item.qty).toFixed(2);
+const readyBadge = item.ready ? '<span style="color:var(--accent2);font-size:11px;">&#10003; Listo</span>' : '<span style="color:var(--muted);font-size:11px;">&#8987; En cocina</span>';
 row.innerHTML =
 '<span class="name">' + escapeHtml(item.name) + '<br><small style="color:#8993b8;">precio unidad ' + priceEach + '</small></span>' +
+readyBadge +
 '<button class="qty-btn" data-act="minus">-</button>' +
 '<span>' + item.qty + '</span>' +
 '<button class="qty-btn" data-act="plus">+</button>' +
@@ -752,25 +1455,20 @@ overlay.querySelector('#subtotalVal').textContent = subtotal.toFixed(2);
 overlay.querySelector('#tipVal').textContent = tip.toFixed(2);
 overlay.querySelector('#totalVal').textContent = (subtotal + tip).toFixed(2);
 renderCanvas();
+renderKitchenView();
 saveState();
 }
 tipEnabledChk.onchange = refresh;
 tipPercentInp.oninput = refresh;
-addItemBtn.onclick = function(){
-const prodId = menuSelect.value;
-const prod = state.menu.find(function(p){ return p.id === prodId; });
-if(!prod){ showAlert('Selecciona un producto del menu.'); return; }
-const existing = table.items.find(function(i){ return i.name === prod.name && i.price === prod.price; });
-if(existing){ existing.qty++; }
-else{ table.items.push({id: uid('i'), name: prod.name, price: prod.price, qty: 1}); }
-refresh();
-};
 function doCharge(){
 table.items = [];
 table.assistance = false;
+table.assignedTo = null;
+table.dirty = true;
 saveState();
 overlay.remove();
 renderCanvas();
+renderKitchenView();
 }
 overlay.querySelector('#chargeBtn').onclick = function(){
 if(table.items.length === 0){
@@ -781,9 +1479,55 @@ showConfirm('Confirmar cobro y liberar la mesa?', doCharge);
 };
 refresh();
 }
-renderFloors();
+
+function renderKitchenView(){
+const el = document.getElementById('kitchenView');
+if(!el) return;
+el.innerHTML = '';
+let any = false;
+state.floors.forEach(function(floor){
+floor.tables.forEach(function(table){
+if(!table.items || table.items.length === 0) return;
+if(table.items.every(function(i){ return i.ready; })) return;
+any = true;
+const assignedUser = (state.users || []).find(function(u){ return u.id === table.assignedTo; });
+const card = document.createElement('div');
+card.className = 'kview-card';
+card.innerHTML = '<h3>' + escapeHtml(floor.name) + ' - Mesa ' + escapeHtml(table.label) + '</h3>' +
+'<div class="kmeta">' + (assignedUser ? 'Mesero: ' + escapeHtml(assignedUser.name) : 'Sin mesero asignado') + '</div>';
+const itemsWrap = document.createElement('div');
+table.items.forEach(function(item){
+const row = document.createElement('div');
+row.className = 'kview-item' + (item.ready ? ' ready' : '');
+row.innerHTML = '<span>' + item.qty + 'x ' + escapeHtml(item.name) + '</span>';
+const btn = document.createElement('button');
+btn.textContent = item.ready ? 'Listo' : 'Marcar listo';
+btn.disabled = item.ready;
+btn.onclick = function(){
+item.ready = true;
+saveState();
+renderKitchenView();
 renderCanvas();
+};
+row.appendChild(btn);
+itemsWrap.appendChild(row);
+});
+card.appendChild(itemsWrap);
+el.appendChild(card);
+});
+});
+if(!any){
+el.innerHTML = '<div class="kview-empty">No hay comandas pendientes.</div>';
+}
+}
+
+lastLoginHadUsers = state.users && state.users.length > 0;
+document.getElementById('appRoot').style.display = 'none';
+document.getElementById('loginScreen').style.display = 'flex';
+renderLoginScreen();
 initFirebase();
+const resumed = loadSession();
+if(resumed){ loginAs(resumed); }
 
 </script>
 </body>
