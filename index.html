@@ -3,6 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#05060d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AutoRest">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/icon-192.png">
 <title>AutoRest - Gestion de Mesas</title>
 <style>
 :root{
@@ -13,7 +21,7 @@
 --border-soft:rgba(148,163,255,0.18);
 --accent:#8b5cf6;
 --accent2:#22d3ee;
---accent-grad:linear-gradient(135deg,#8b5cf6,#22d3ee);
+--accent-grad:linear-gradient(135deg,var(--accent),var(--accent2));
 --free:#2dffb0;
 --occupied:#ffb347;
 --dirty:#9ca3c4;
@@ -118,6 +126,7 @@ transition:box-shadow .2s, transform .15s;
 .form-row{margin-bottom:12px;}
 .form-row label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:600;}
 .form-row input[type=text], .form-row input[type=number], .form-row select{width:100%;padding:8px 10px;border:1px solid var(--border-soft);border-radius:8px;font-size:13px;background:rgba(255,255,255,0.04);color:var(--text);}
+.form-row select option, select option{background:#161a2e;color:#e8ecfb;}
 .form-row input:focus, .form-row select:focus{outline:2px solid var(--accent2);outline-offset:1px;}
 .color-presets{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
 .color-presets span{display:inline-block;width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid rgba(255,255,255,0.25);transition:transform .15s;}
@@ -202,13 +211,49 @@ display:flex;align-items:center;justify-content:center;z-index:300;}
 .menu-item-row-admin{display:flex;align-items:center;gap:10px;}
 .thumb-sm{width:38px;height:38px;border-radius:8px;object-fit:cover;background:rgba(255,255,255,0.05);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--muted);overflow:hidden;}
 .thumb-sm img{width:100%;height:100%;object-fit:cover;}
+.kview-item .elapsed{color:var(--muted);}
+.kview-item.late{background:rgba(255,61,110,0.1);border-radius:6px;padding-left:6px;}
+.kview-item.late .elapsed{color:var(--danger);font-weight:700;}
+.catalog-card.out{opacity:.45;filter:grayscale(.6);}
+.stock-btn{font-size:13px;}
+.cat-tile:focus-visible, .catalog-card:focus-visible, .table-el:focus-visible{outline:2px solid var(--accent2);outline-offset:2px;}
+.report-stats{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:16px;}
+.report-stat{background:rgba(255,255,255,0.04);border:1px solid var(--border-soft);border-radius:10px;padding:10px 14px;min-width:104px;}
+.report-stat b{display:block;font-size:19px;}
+.report-stat span{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+.report-list{margin-bottom:16px;}
+.report-list h4{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:0 0 8px;}
+.report-row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
+.report-empty{font-size:12px;color:var(--muted);}
+.log-list{max-height:220px;overflow-y:auto;border:1px solid var(--border-soft);border-radius:10px;padding:8px 12px;}
+.log-row{display:flex;flex-wrap:wrap;gap:6px;font-size:12px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
+.log-row:last-child{border-bottom:none;}
+.log-time{color:var(--muted);font-family:ui-monospace,monospace;min-width:76px;}
+.log-who{font-weight:700;color:var(--accent2);}
+.log-action{flex:1;color:var(--text);}
+.log-action small{color:var(--muted);}
+.install-banner{position:fixed;left:12px;right:12px;bottom:12px;z-index:400;background:linear-gradient(180deg, rgba(24,27,52,0.98), rgba(14,16,34,0.98));border:1px solid var(--border-soft);border-radius:14px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 12px 30px rgba(0,0,0,0.5), var(--glow-accent);color:var(--text);font-size:13px;max-width:420px;margin:0 auto;}
+.install-banner[hidden]{display:none;}
+.install-banner-actions{display:flex;gap:8px;flex-shrink:0;}
+.install-banner-actions .btn{padding:7px 12px;font-size:12px;}
+.sign-el{position:absolute;padding:7px 16px;border-radius:20px;background:rgba(17,20,40,0.82);border:1.5px dashed var(--border-soft);color:var(--text);font-size:13px;font-weight:700;letter-spacing:.3px;user-select:none;white-space:nowrap;backdrop-filter:blur(6px);box-shadow:0 4px 14px rgba(0,0,0,0.35);}
+.sign-el.editable{cursor:pointer;}
+.sign-el.editable:hover{border-color:var(--accent);background:rgba(139,92,246,0.18);}
+.sign-el:focus-visible{outline:2px solid var(--accent2);outline-offset:2px;}
 </style>
 </head>
 <body>
 <div id="loginScreen" class="login-screen" style="display:none;"></div>
+<div id="installBanner" class="install-banner" hidden>
+<span>&#128241; Instala AutoRest en tu celular para entrar mas rapido</span>
+<div class="install-banner-actions">
+<button id="installBtn" class="btn primary">Instalar</button>
+<button id="installDismissBtn" class="btn" aria-label="Cerrar">&times;</button>
+</div>
+</div>
 <div id="appRoot" style="display:none;">
 <header>
-<h1>AutoRest</h1>
+<h1 id="brandTitle">AutoRest</h1>
 <div class="live-indicator" id="liveIndicator"><span class="live-dot" id="liveDot"></span><span id="liveText">Conectando...</span></div>
 <div class="floors" id="floorsContainer"></div>
 <button class="add-floor-btn" id="addFloorBtn">+ Piso</button>
@@ -232,8 +277,11 @@ Modo edicion (mover / crear)
 </label>
 <button class="btn" id="addCircleBtn">&#9711; Mesa circular</button>
 <button class="btn" id="addSquareBtn">&#9635; Mesa cuadrada</button>
+<button class="btn" id="addSignBtn">&#127991; Cartel</button>
 <button class="btn" id="menuBtn">&#127860; Gestionar menu</button>
 <button class="btn" id="usersBtn">&#128101; Gestionar usuarios</button>
+<button class="btn" id="reportsBtn">&#128202; Reportes</button>
+<button class="btn" id="settingsBtn">&#9881; Ajustes</button>
 <span class="hint-bar" id="hintBar"></span>
 </div>
 </div>
@@ -246,16 +294,14 @@ const STORAGE_KEY = 'autorest_state_v1';
 function defaultState(){
 return {
 floors: [
-{id:'f1', name:'Piso 1', tables:[]},
-{id:'f2', name:'Piso 2', tables:[]},
-{id:'f3', name:'Piso 4', tables:[]},
-{id:'f4', name:'Bodega', tables:[]},
-{id:'f5', name:'Sotano', tables:[]}
+{id:'f1', name:'Piso 1', tables:[]}
 ],
 activeFloor: 'f1',
 menu: [],
 categories: defaultCategories(),
-users: []
+users: [],
+settings: defaultSettings(),
+sales: []
 };
 }
 function defaultCategories(){
@@ -265,6 +311,9 @@ return [
 {id: uid('c'), name: 'Postres'}
 ];
 }
+function defaultSettings(){
+return { name: 'AutoRest', accentColor: '#8b5cf6', taxPercent: 0 };
+}
 function normalizeMenu(obj){
 if(!Array.isArray(obj.categories) || obj.categories.length === 0){
 obj.categories = defaultCategories();
@@ -273,7 +322,14 @@ if(!Array.isArray(obj.menu)) obj.menu = [];
 obj.menu.forEach(function(p){
 if(typeof p.categoryId === 'undefined') p.categoryId = null;
 if(typeof p.image !== 'string') p.image = '';
+if(typeof p.outOfStock !== 'boolean') p.outOfStock = false;
 });
+if(!obj.settings || typeof obj.settings !== 'object') obj.settings = defaultSettings();
+if(!obj.settings.name) obj.settings.name = 'AutoRest';
+if(!obj.settings.accentColor) obj.settings.accentColor = '#8b5cf6';
+if(typeof obj.settings.taxPercent !== 'number' || isNaN(obj.settings.taxPercent)) obj.settings.taxPercent = 0;
+if(!Array.isArray(obj.sales)) obj.sales = [];
+if(!Array.isArray(obj.activityLog)) obj.activityLog = [];
 }
 function loadLocalState(){
 try{
@@ -293,9 +349,13 @@ return defaultState();
 function normalizeFloors(floors){
 floors.forEach(function(f){
 if(!Array.isArray(f.tables)) f.tables = [];
+if(!Array.isArray(f.signs)) f.signs = [];
 f.tables.forEach(function(t){
 if(!Array.isArray(t.items)) t.items = [];
-t.items.forEach(function(i){ if(typeof i.ready !== 'boolean') i.ready = false; });
+t.items.forEach(function(i){
+if(typeof i.ready !== 'boolean') i.ready = false;
+if(typeof i.addedAt !== 'number') i.addedAt = Date.now();
+});
 if(typeof t.assignedTo === 'undefined') t.assignedTo = null;
 if(typeof t.dirty !== 'boolean') t.dirty = false;
 });
@@ -357,6 +417,7 @@ currentUser = user;
 saveSession(user);
 document.getElementById('loginScreen').style.display = 'none';
 document.getElementById('appRoot').style.display = 'block';
+applyBranding();
 applyRoleUI();
 renderFloors();
 renderCanvas();
@@ -378,12 +439,14 @@ return;
 loginAs(u);
 }
 function renderLoginScreen(){
+applyBranding();
 const el = document.getElementById('loginScreen');
+const brandName = escapeHtml((state.settings && state.settings.name) || 'AutoRest');
 const hasUsers = state.users && state.users.length > 0;
 if(!hasUsers){
 el.innerHTML =
 '<div class="login-box">' +
-'<h1>AutoRest</h1>' +
+'<h1>' + brandName + '</h1>' +
 '<p>Primer uso: crea el PIN del administrador</p>' +
 '<div class="login-error" id="loginErr"></div>' +
 '<div class="form-row"><label>Tu nombre</label><input type="text" id="setupName" placeholder="Administrador"></div>' +
@@ -403,12 +466,13 @@ if(!Array.isArray(state.users)) state.users = [];
 state.users.push(admin);
 saveState();
 loginAs(admin);
+openSetupWizard();
 };
 return;
 }
 el.innerHTML =
 '<div class="login-box">' +
-'<h1>AutoRest</h1>' +
+'<h1>' + brandName + '</h1>' +
 '<p>Ingresa tu PIN</p>' +
 '<div class="pin-dots" id="pinDots"><span></span><span></span><span></span><span></span></div>' +
 '<div class="login-error" id="loginErr"></div>' +
@@ -531,6 +595,7 @@ if(currentUser){
 const stillExists = state.users.find(function(u){ return u.id === currentUser.id; });
 if(!stillExists){ logout(); return; }
 currentUser = stillExists;
+applyBranding();
 renderFloors();
 renderCanvas();
 renderKitchenView();
@@ -595,6 +660,66 @@ if(m === '"') return '&quot;';
 return '&#39;';
 });
 }
+function applyBranding(){
+const s = state.settings || defaultSettings();
+document.documentElement.style.setProperty('--accent', s.accentColor);
+const brandTitle = document.getElementById('brandTitle');
+if(brandTitle) brandTitle.textContent = s.name;
+document.title = s.name + ' - Gestion de Mesas';
+}
+function wireModal(overlay){
+overlay.setAttribute('role', 'dialog');
+overlay.setAttribute('aria-modal', 'true');
+const focusables = overlay.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+if(focusables.length === 0) return;
+const first = focusables[0];
+const last = focusables[focusables.length - 1];
+overlay.addEventListener('keydown', function(e){
+if(e.key !== 'Tab') return;
+if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+});
+first.focus();
+}
+document.addEventListener('keydown', function(e){
+if(e.key !== 'Escape') return;
+const overlays = document.querySelectorAll('.modal-overlay');
+if(overlays.length === 0) return;
+overlays[overlays.length - 1].remove();
+renderCanvas();
+renderKitchenView();
+});
+let audioCtx = null;
+function playBeep(){
+try{
+if(!audioCtx){ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+if(audioCtx.state === 'suspended'){ audioCtx.resume(); }
+const o = audioCtx.createOscillator();
+const g = audioCtx.createGain();
+o.type = 'sine';
+o.frequency.value = 880;
+g.gain.value = 0.15;
+o.connect(g);
+g.connect(audioCtx.destination);
+o.start();
+g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+o.stop(audioCtx.currentTime + 0.4);
+}catch(e){}
+}
+function logActivity(action, floor, table){
+if(!Array.isArray(state.activityLog)) state.activityLog = [];
+state.activityLog.push({
+id: uid('log'),
+ts: Date.now(),
+userId: currentUser ? currentUser.id : null,
+userName: currentUser ? currentUser.name : 'Sistema',
+role: currentUser ? currentUser.role : '',
+action: action,
+floorName: floor ? floor.name : '',
+tableLabel: table ? table.label : ''
+});
+if(state.activityLog.length > 500){ state.activityLog = state.activityLog.slice(state.activityLog.length - 500); }
+}
 function resizeImageToDataUrl(file, callback){
 const reader = new FileReader();
 reader.onload = function(e){
@@ -626,6 +751,7 @@ overlay.innerHTML =
 '</div>' +
 '</div>';
 document.body.appendChild(overlay);
+wireModal(overlay);
 const input = overlay.querySelector('#promptInput');
 setTimeout(function(){ input.focus(); input.select(); }, 0);
 function ok(){ const v = input.value; overlay.remove(); onOk(v); }
@@ -648,6 +774,7 @@ overlay.innerHTML =
 '</div>' +
 '</div>';
 document.body.appendChild(overlay);
+wireModal(overlay);
 overlay.querySelector('#confirmNo').onclick = function(){ overlay.remove(); };
 overlay.querySelector('#confirmYes').onclick = function(){ overlay.remove(); onYes(); };
 }
@@ -662,6 +789,7 @@ overlay.innerHTML =
 '</div>' +
 '</div>';
 document.body.appendChild(overlay);
+wireModal(overlay);
 overlay.querySelector('#alertOk').onclick = function(){ overlay.remove(); };
 }
 
@@ -741,6 +869,12 @@ canvas.appendChild(hint);
 floor.tables.forEach(function(table){
 const el = document.createElement('div');
 el.className = 'table-el ' + table.shape + (table.assistance ? ' blink' : '') + (table.dirty ? ' dirty' : '');
+el.tabIndex = 0;
+el.setAttribute('role', 'button');
+el.setAttribute('aria-label', 'Mesa ' + table.label);
+el.addEventListener('keydown', function(e){
+if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); el.click(); }
+});
 el.style.left = table.x + 'px';
 el.style.top = table.y + 'px';
 el.style.width = table.size + 'px';
@@ -793,6 +927,7 @@ bell.onclick = function(e){
 e.stopPropagation();
 if(!canOperateTable(table)){ showAlert('No puedes modificar esta mesa.'); return; }
 table.assistance = !table.assistance;
+logActivity(table.assistance ? 'Solicito asistencia' : 'Cancelo la solicitud de asistencia', floor, table);
 saveState(); renderCanvas();
 };
 el.appendChild(bell);
@@ -807,6 +942,7 @@ if(isMesero()){
 if(!table.assignedTo){
 showConfirm('Atender la mesa ' + table.label + '?', function(){
 table.assignedTo = currentUser.id;
+logActivity('Atendio la mesa', floor, table);
 saveState();
 renderCanvas();
 openOrderModal(table, floor);
@@ -851,6 +987,55 @@ el.addEventListener('pointerup', onUp);
 el.addEventListener('pointercancel', onUp);
 });
 
+canvas.appendChild(el);
+});
+(floor.signs || []).forEach(function(sign){
+const canEdit = isAdmin() && editMode;
+const el = document.createElement('div');
+el.className = 'sign-el' + (canEdit ? ' editable' : '');
+el.style.left = sign.x + 'px';
+el.style.top = sign.y + 'px';
+el.textContent = sign.text;
+if(canEdit){
+el.tabIndex = 0;
+el.setAttribute('role', 'button');
+el.setAttribute('aria-label', 'Cartel: ' + sign.text);
+let signDragged = false;
+el.onclick = function(){
+if(signDragged){ signDragged = false; return; }
+openSignModal(sign, floor);
+};
+el.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); el.click(); } });
+el.addEventListener('pointerdown', function(e){
+if(e.pointerType === 'mouse' && e.button !== 0) return;
+e.preventDefault();
+const pointerId = e.pointerId;
+const startX = e.clientX, startY = e.clientY;
+const origX = sign.x, origY = sign.y;
+signDragged = false;
+try{ el.setPointerCapture(pointerId); }catch(err){}
+function onMove(ev){
+if(ev.pointerId !== pointerId) return;
+const dx = ev.clientX - startX, dy = ev.clientY - startY;
+if(Math.abs(dx) > 3 || Math.abs(dy) > 3) signDragged = true;
+sign.x = Math.max(0, origX + dx);
+sign.y = Math.max(0, origY + dy);
+el.style.left = sign.x + 'px';
+el.style.top = sign.y + 'px';
+}
+function onUp(ev){
+if(ev.pointerId !== pointerId) return;
+el.removeEventListener('pointermove', onMove);
+el.removeEventListener('pointerup', onUp);
+el.removeEventListener('pointercancel', onUp);
+try{ el.releasePointerCapture(pointerId); }catch(err){}
+if(signDragged) saveState();
+}
+el.addEventListener('pointermove', onMove);
+el.addEventListener('pointerup', onUp);
+el.addEventListener('pointercancel', onUp);
+});
+}
 canvas.appendChild(el);
 });
 refreshLiveIndicator();
@@ -899,10 +1084,27 @@ saveState();
 renderCanvas();
 });
 }
+function addSign(){
+if(!isAdmin()) return;
+const floor = getActiveFloor();
+showPrompt('Texto del cartel (ej: Entrada, Bano, Cocina)', '', function(text){
+if(!text || !text.trim()) return;
+if(!Array.isArray(floor.signs)) floor.signs = [];
+floor.signs.push({id: uid('sg'), text: text.trim(), x: 40, y: 40});
+editMode = true;
+editModeChk.checked = true;
+updateHint();
+saveState();
+renderCanvas();
+});
+}
 document.getElementById('addCircleBtn').onclick = function(){ addTable('circle'); };
 document.getElementById('addSquareBtn').onclick = function(){ addTable('square'); };
+document.getElementById('addSignBtn').onclick = addSign;
 document.getElementById('menuBtn').onclick = function(){ if(isAdmin()) openMenuModal(); };
 document.getElementById('usersBtn').onclick = function(){ if(isAdmin()) openUsersModal(); };
+document.getElementById('reportsBtn').onclick = function(){ if(isAdmin()) openReportsModal(); };
+document.getElementById('settingsBtn').onclick = function(){ if(isAdmin()) openSettingsModal(); };
 document.getElementById('kitchenToggleBtn').onclick = function(){
 if(!isAdmin()) return;
 setViewMode(viewMode === 'floor' ? 'kitchen' : 'floor');
@@ -956,6 +1158,7 @@ overlay.innerHTML =
 '</div>' +
 '</div>';
 document.body.appendChild(overlay);
+wireModal(overlay);
 overlay.querySelector('.close-x').onclick = function(){ overlay.remove(); };
 overlay.addEventListener('click', function(e){ if(e.target === overlay) overlay.remove(); });
 overlay.querySelector('#edtSize').addEventListener('input', function(e){
@@ -970,7 +1173,12 @@ table.shape = overlay.querySelector('#edtShape').value;
 table.size = parseInt(overlay.querySelector('#edtSize').value, 10);
 table.color = overlay.querySelector('#edtColor').value;
 table.fillStyle = overlay.querySelector('#edtFill').value;
+const prevAssigned = table.assignedTo;
 table.assignedTo = overlay.querySelector('#edtAssign').value || null;
+if(table.assignedTo !== prevAssigned){
+const au = (state.users || []).find(function(u){ return u.id === table.assignedTo; });
+logActivity('Asigno la mesa a ' + (au ? au.name : 'nadie'), floor, table);
+}
 saveState();
 renderCanvas();
 overlay.remove();
@@ -1015,6 +1223,7 @@ overlay.innerHTML =
 '</div>' +
 '</div>';
 document.body.appendChild(overlay);
+wireModal(overlay);
 overlay.querySelector('.close-x').onclick = function(){ overlay.remove(); };
 overlay.addEventListener('click', function(e){ if(e.target === overlay) overlay.remove(); });
 overlay.querySelector('#prodImgInput').addEventListener('change', function(e){
@@ -1031,7 +1240,7 @@ const price = parseFloat(overlay.querySelector('#prodPrice').value);
 const categoryId = overlay.querySelector('#prodCategory').value || null;
 if(!name || isNaN(price) || price < 0){ showAlert('Ingresa un nombre y un valor valido.'); return; }
 if(isNew){
-state.menu.push({id: uid('m'), name: name, price: price, categoryId: categoryId, image: pendingImage});
+state.menu.push({id: uid('m'), name: name, price: price, categoryId: categoryId, image: pendingImage, outOfStock: false});
 }else{
 prod.name = name;
 prod.price = price;
@@ -1071,6 +1280,7 @@ overlay.innerHTML =
 '<button class="btn primary" id="addProductBtn" style="width:100%;margin-top:10px;">+ Nuevo producto</button>' +
 '</div>';
 document.body.appendChild(overlay);
+wireModal(overlay);
 overlay.querySelector('.close-x').onclick = function(){ overlay.remove(); renderCanvas(); };
 overlay.addEventListener('click', function(e){ if(e.target === overlay){ overlay.remove(); renderCanvas(); } });
 function renderCatTags(){
@@ -1136,9 +1346,21 @@ thumb.className = 'thumb-sm';
 thumb.innerHTML = prod.image ? '<img src="' + prod.image + '">' : '🍽️';
 left.appendChild(thumb);
 const textWrap = document.createElement('span');
-textWrap.innerHTML = escapeHtml(prod.name) + '<br><small style="color:#8993b8;">' + escapeHtml(categoryName(prod.categoryId)) + ' · valor ' + prod.price.toFixed(2) + '</small>';
+textWrap.innerHTML = '<span' + (prod.outOfStock ? ' style="text-decoration:line-through;opacity:.55;"' : '') + '>' + escapeHtml(prod.name) + '</span>' +
+(prod.outOfStock ? ' <small style="color:var(--danger);">agotado</small>' : '') +
+'<br><small style="color:#8993b8;">' + escapeHtml(categoryName(prod.categoryId)) + ' · valor ' + prod.price.toFixed(2) + '</small>';
 left.appendChild(textWrap);
 row.appendChild(left);
+const stockBtn = document.createElement('button');
+stockBtn.className = 'qty-btn stock-btn';
+stockBtn.title = prod.outOfStock ? 'Marcar disponible' : 'Marcar agotado por hoy';
+stockBtn.textContent = prod.outOfStock ? '✓' : '🚫';
+stockBtn.onclick = function(){
+prod.outOfStock = !prod.outOfStock;
+saveState();
+renderMenuItems();
+};
+row.appendChild(stockBtn);
 const editBtn = document.createElement('button');
 editBtn.className = 'qty-btn';
 editBtn.title = 'Editar';
@@ -1170,6 +1392,7 @@ overlay.innerHTML =
 '<button class="btn primary" id="addUserBtn" style="width:100%;">Agregar usuario</button>' +
 '</div>';
 document.body.appendChild(overlay);
+wireModal(overlay);
 overlay.querySelector('.close-x').onclick = function(){ overlay.remove(); };
 overlay.addEventListener('click', function(e){ if(e.target === overlay) overlay.remove(); });
 function renderUsersList(){
@@ -1233,6 +1456,219 @@ renderUsersList();
 renderUsersList();
 }
 
+function openSettingsModal(){
+if(!isAdmin()) return;
+const overlay = document.createElement('div');
+overlay.className = 'modal-overlay';
+let presetsHtml = '';
+PRESET_COLORS.forEach(function(c){
+presetsHtml += '<span style="background:' + c + '" data-color="' + c + '"></span>';
+});
+overlay.innerHTML =
+'<div class="modal">' +
+'<h2>Ajustes <span class="close-x">&times;</span></h2>' +
+'<div class="form-row"><label>Nombre del restaurante</label><input type="text" id="setName" value="' + escapeHtml(state.settings.name) + '"></div>' +
+'<div class="form-row"><label>Color de acento</label><input type="color" id="setColor" value="' + state.settings.accentColor + '">' +
+'<div class="color-presets" id="setPresets">' + presetsHtml + '</div></div>' +
+'<div class="form-row"><label>Impuesto sobre las ventas (%)</label><input type="number" id="setTax" min="0" max="100" step="0.1" value="' + state.settings.taxPercent + '"></div>' +
+'<button class="btn primary" id="setSaveBtn" style="width:100%;">Guardar ajustes</button>' +
+'</div>';
+document.body.appendChild(overlay);
+wireModal(overlay);
+overlay.querySelector('.close-x').onclick = function(){ overlay.remove(); };
+overlay.addEventListener('click', function(e){ if(e.target === overlay) overlay.remove(); });
+overlay.querySelectorAll('#setPresets span').forEach(function(sw){
+sw.onclick = function(){ overlay.querySelector('#setColor').value = sw.getAttribute('data-color'); };
+});
+overlay.querySelector('#setSaveBtn').onclick = function(){
+const name = overlay.querySelector('#setName').value.trim();
+const tax = parseFloat(overlay.querySelector('#setTax').value);
+state.settings.name = name || 'AutoRest';
+state.settings.accentColor = overlay.querySelector('#setColor').value;
+state.settings.taxPercent = isNaN(tax) ? 0 : Math.max(0, tax);
+applyBranding();
+saveState();
+overlay.remove();
+};
+}
+
+function openSetupWizard(){
+const steps = ['brand', 'tax', 'done'];
+let stepIndex = 0;
+const overlay = document.createElement('div');
+overlay.className = 'modal-overlay';
+document.body.appendChild(overlay);
+function render(){
+const step = steps[stepIndex];
+let inner = '';
+if(step === 'brand'){
+inner =
+'<h2>Bienvenido</h2>' +
+'<p>Antes de empezar, dale identidad a tu restaurante. Podras cambiar esto luego desde Ajustes.</p>' +
+'<div class="form-row"><label>Nombre del restaurante</label><input type="text" id="wizName" placeholder="Mi Restaurante" value="' + (state.settings.name === 'AutoRest' ? '' : escapeHtml(state.settings.name)) + '"></div>' +
+'<div class="form-row"><label>Color de acento</label><input type="color" id="wizColor" value="' + state.settings.accentColor + '">' +
+'<div class="color-presets" id="wizPresets"></div></div>' +
+'<button class="btn primary" id="wizNext" style="width:100%;margin-top:6px;">Continuar</button>';
+}else if(step === 'tax'){
+inner =
+'<h2>Impuesto</h2>' +
+'<p>&#191;Aplicas algun impuesto (IVA u otro) sobre tus ventas? Puedes cambiarlo despues en Ajustes.</p>' +
+'<div class="form-row"><label>Impuesto (%)</label><input type="number" id="wizTax" min="0" max="100" step="0.1" value="' + state.settings.taxPercent + '"></div>' +
+'<button class="btn primary" id="wizNext" style="width:100%;margin-top:6px;">Continuar</button>';
+}else{
+inner =
+'<h2>Listo</h2>' +
+'<p>Ya tienes un primer piso ("' + escapeHtml(getActiveFloor().name) + '"). Usa el boton &#128736; de abajo para agregar mesas, y "Gestionar menu" para cargar tus productos con fotos y categorias.</p>' +
+'<button class="btn primary" id="wizFinish" style="width:100%;margin-top:6px;">Empezar a usar ' + escapeHtml(state.settings.name) + '</button>';
+}
+overlay.innerHTML = '<div class="modal" style="text-align:left;">' + inner + '</div>';
+wireModal(overlay);
+if(step === 'brand'){
+let presetsHtml = '';
+PRESET_COLORS.forEach(function(c){ presetsHtml += '<span style="background:' + c + '" data-color="' + c + '"></span>'; });
+overlay.querySelector('#wizPresets').innerHTML = presetsHtml;
+overlay.querySelectorAll('#wizPresets span').forEach(function(sw){
+sw.onclick = function(){ overlay.querySelector('#wizColor').value = sw.getAttribute('data-color'); };
+});
+overlay.querySelector('#wizNext').onclick = function(){
+const name = overlay.querySelector('#wizName').value.trim();
+state.settings.name = name || 'AutoRest';
+state.settings.accentColor = overlay.querySelector('#wizColor').value;
+applyBranding();
+saveState();
+stepIndex++;
+render();
+};
+}else if(step === 'tax'){
+overlay.querySelector('#wizNext').onclick = function(){
+const tax = parseFloat(overlay.querySelector('#wizTax').value);
+state.settings.taxPercent = isNaN(tax) ? 0 : Math.max(0, tax);
+saveState();
+stepIndex++;
+render();
+};
+}else{
+overlay.querySelector('#wizFinish').onclick = function(){ overlay.remove(); };
+}
+}
+render();
+}
+
+function isSameLocalDay(ts, ref){
+const a = new Date(ts);
+return a.getFullYear() === ref.getFullYear() && a.getMonth() === ref.getMonth() && a.getDate() === ref.getDate();
+}
+
+function exportSalesCsv(){
+const rows = [['Fecha', 'Piso', 'Mesa', 'Mesero', 'Producto', 'Cantidad', 'Precio unidad', 'Subtotal venta', 'Impuesto venta', 'Propina venta', 'Total venta']];
+(state.sales || []).forEach(function(s){
+const dateStr = new Date(s.closedAt).toLocaleString('es-ES');
+s.items.forEach(function(i){
+rows.push([dateStr, s.floorName, s.tableLabel, s.waiterName, i.name, i.qty, i.price.toFixed(2), s.subtotal.toFixed(2), s.tax.toFixed(2), s.tip.toFixed(2), s.total.toFixed(2)]);
+});
+});
+const csv = rows.map(function(r){
+return r.map(function(v){
+const str = String(v).replace(/"/g, '""');
+return /[",\n]/.test(str) ? '"' + str + '"' : str;
+}).join(',');
+}).join('\r\n');
+const blob = new Blob(['﻿' + csv], {type: 'text/csv;charset=utf-8;'});
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = 'ventas_' + (state.settings.name || 'autorest').replace(/\s+/g, '_') + '_' + new Date().toISOString().slice(0, 10) + '.csv';
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+URL.revokeObjectURL(url);
+}
+
+function openReportsModal(){
+if(!isAdmin()) return;
+const overlay = document.createElement('div');
+overlay.className = 'modal-overlay';
+const now = new Date();
+const todaySales = (state.sales || []).filter(function(s){ return isSameLocalDay(s.closedAt, now); });
+const totalToday = todaySales.reduce(function(s, x){ return s + x.total; }, 0);
+const prodQty = {};
+todaySales.forEach(function(s){ s.items.forEach(function(i){ prodQty[i.name] = (prodQty[i.name] || 0) + i.qty; }); });
+const topProducts = Object.keys(prodQty).map(function(k){ return {name: k, qty: prodQty[k]}; }).sort(function(a, b){ return b.qty - a.qty; }).slice(0, 5);
+const waiterTotals = {};
+todaySales.forEach(function(s){
+const key = s.waiterName || 'Sin mesero';
+waiterTotals[key] = (waiterTotals[key] || 0) + s.total;
+});
+const waiterRows = Object.keys(waiterTotals).map(function(k){ return {name: k, total: waiterTotals[k]}; }).sort(function(a, b){ return b.total - a.total; });
+let topProductsHtml = topProducts.length === 0 ? '<div class="report-empty">Sin ventas hoy.</div>' :
+topProducts.map(function(p){ return '<div class="report-row"><span>' + escapeHtml(p.name) + '</span><span>' + p.qty + ' und</span></div>'; }).join('');
+let waiterRowsHtml = waiterRows.length === 0 ? '<div class="report-empty">Sin ventas hoy.</div>' :
+waiterRows.map(function(w){ return '<div class="report-row"><span>' + escapeHtml(w.name) + '</span><span>' + w.total.toFixed(2) + '</span></div>'; }).join('');
+const recentLog = (state.activityLog || []).slice(-40).reverse();
+let logHtml = recentLog.length === 0 ? '<div class="report-empty">Sin actividad registrada.</div>' :
+recentLog.map(function(e){
+const time = new Date(e.ts).toLocaleString('es-ES', {day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'});
+const where = e.tableLabel ? (escapeHtml(e.floorName) + ' &middot; Mesa ' + escapeHtml(e.tableLabel)) : '';
+return '<div class="log-row"><span class="log-time">' + time + '</span><span class="log-who">' + escapeHtml(e.userName) + '</span><span class="log-action">' + escapeHtml(e.action) + (where ? ' <small>(' + where + ')</small>' : '') + '</span></div>';
+}).join('');
+overlay.innerHTML =
+'<div class="modal" style="width:440px;">' +
+'<h2>Reportes <span class="close-x">&times;</span></h2>' +
+'<div class="report-stats">' +
+'<div class="report-stat"><b>' + totalToday.toFixed(2) + '</b><span>Vendido hoy</span></div>' +
+'<div class="report-stat"><b>' + todaySales.length + '</b><span>Cuentas cerradas hoy</span></div>' +
+'<div class="report-stat"><b>' + (state.sales || []).length + '</b><span>Total historico</span></div>' +
+'</div>' +
+'<div class="report-list"><h4>Top productos hoy</h4>' + topProductsHtml + '</div>' +
+'<div class="report-list"><h4>Ventas por mesero hoy</h4>' + waiterRowsHtml + '</div>' +
+'<div class="report-list"><h4>Registro de actividad (ultimas 40)</h4><div class="log-list">' + logHtml + '</div></div>' +
+'<button class="btn primary" id="exportCsvBtn" style="width:100%;">&#128190; Exportar todas las ventas a CSV</button>' +
+'</div>';
+document.body.appendChild(overlay);
+wireModal(overlay);
+overlay.querySelector('.close-x').onclick = function(){ overlay.remove(); };
+overlay.addEventListener('click', function(e){ if(e.target === overlay) overlay.remove(); });
+overlay.querySelector('#exportCsvBtn').onclick = function(){
+if(!state.sales || state.sales.length === 0){ showAlert('Todavia no hay ventas registradas.'); return; }
+exportSalesCsv();
+};
+}
+
+function openSignModal(sign, floor){
+if(!isAdmin()) return;
+const overlay = document.createElement('div');
+overlay.className = 'modal-overlay';
+overlay.innerHTML =
+'<div class="modal" style="width:300px;">' +
+'<h2>Editar cartel <span class="close-x">&times;</span></h2>' +
+'<div class="form-row"><label>Texto</label><input type="text" id="signText" value="' + escapeHtml(sign.text) + '"></div>' +
+'<div style="display:flex;gap:8px;margin-top:14px;">' +
+'<button class="btn primary" id="signSaveBtn">Guardar</button>' +
+'<button class="btn danger" id="signDelBtn">Eliminar</button>' +
+'</div>' +
+'</div>';
+document.body.appendChild(overlay);
+wireModal(overlay);
+overlay.querySelector('.close-x').onclick = function(){ overlay.remove(); };
+overlay.addEventListener('click', function(e){ if(e.target === overlay) overlay.remove(); });
+overlay.querySelector('#signSaveBtn').onclick = function(){
+const val = overlay.querySelector('#signText').value.trim();
+if(!val){ showAlert('Escribe un texto para el cartel.'); return; }
+sign.text = val;
+saveState();
+renderCanvas();
+overlay.remove();
+};
+overlay.querySelector('#signDelBtn').onclick = function(){
+showConfirm('Eliminar el cartel "' + sign.text + '"?', function(){
+floor.signs = floor.signs.filter(function(s){ return s.id !== sign.id; });
+saveState();
+renderCanvas();
+overlay.remove();
+});
+};
+}
+
 function openCleaningModal(table, floor){
 const overlay = document.createElement('div');
 overlay.className = 'modal-overlay';
@@ -1243,10 +1679,12 @@ overlay.innerHTML =
 '<button class="btn primary" id="markCleanBtn" style="width:100%;">Marcar como limpia</button>' +
 '</div>';
 document.body.appendChild(overlay);
+wireModal(overlay);
 overlay.querySelector('.close-x').onclick = function(){ overlay.remove(); };
 overlay.addEventListener('click', function(e){ if(e.target === overlay) overlay.remove(); });
 overlay.querySelector('#markCleanBtn').onclick = function(){
 table.dirty = false;
+logActivity('Marco la mesa como limpia', floor, table);
 saveState();
 renderCanvas();
 overlay.remove();
@@ -1275,8 +1713,49 @@ itemsHtml +
 '<div class="totals"><div class="row grand"><span>Subtotal</span><span>' + subtotal.toFixed(2) + '</span></div></div>' +
 '</div>';
 document.body.appendChild(overlay);
+wireModal(overlay);
 overlay.querySelector('.close-x').onclick = function(){ overlay.remove(); };
 overlay.addEventListener('click', function(e){ if(e.target === overlay) overlay.remove(); });
+}
+
+function printReceipt(table){
+const subtotal = table.items.reduce(function(s, i){ return s + i.price * i.qty; }, 0);
+const taxPercent = (state.settings && state.settings.taxPercent) || 0;
+const tax = subtotal * (taxPercent / 100);
+const tip = table.tipEnabled ? subtotal * (table.tipPercent / 100) : 0;
+const total = subtotal + tax + tip;
+const brand = escapeHtml((state.settings && state.settings.name) || 'AutoRest');
+const rowsHtml = table.items.map(function(i){
+return '<tr><td>' + i.qty + 'x ' + escapeHtml(i.name) + '</td><td style="text-align:right;">' + (i.price * i.qty).toFixed(2) + '</td></tr>';
+}).join('');
+const html =
+'<!doctype html><html><head><meta charset="utf-8"><title>Recibo</title><style>' +
+'body{font-family:ui-monospace,Consolas,monospace;width:280px;margin:0 auto;padding:16px;color:#111;}' +
+'h1{font-size:16px;text-align:center;margin:0 0 4px;}' +
+'.meta{text-align:center;font-size:11px;color:#555;margin-bottom:10px;}' +
+'table{width:100%;border-collapse:collapse;font-size:12px;}' +
+'td{padding:3px 0;}' +
+'.tot{border-top:1px dashed #999;margin-top:8px;padding-top:6px;font-size:12px;}' +
+'.tot .grand{font-weight:700;font-size:14px;border-top:1px solid #111;margin-top:4px;padding-top:4px;}' +
+'.line{display:flex;justify-content:space-between;}' +
+'</style></head><body>' +
+'<h1>' + brand + '</h1>' +
+'<div class="meta">Mesa ' + escapeHtml(table.label) + ' &middot; ' + new Date().toLocaleString('es-ES') + '</div>' +
+'<table>' + rowsHtml + '</table>' +
+'<div class="tot">' +
+'<div class="line"><span>Subtotal</span><span>' + subtotal.toFixed(2) + '</span></div>' +
+(taxPercent > 0 ? '<div class="line"><span>Impuesto (' + taxPercent + '%)</span><span>' + tax.toFixed(2) + '</span></div>' : '') +
+(tip > 0 ? '<div class="line"><span>Propina (' + table.tipPercent + '%)</span><span>' + tip.toFixed(2) + '</span></div>' : '') +
+'<div class="line grand"><span>Total</span><span>' + total.toFixed(2) + '</span></div>' +
+'</div>' +
+'<div class="meta" style="margin-top:14px;">Gracias por su visita</div>' +
+'</body></html>';
+const win = window.open('', '_blank', 'width=340,height=600');
+if(!win){ showAlert('El navegador bloqueo la ventana de impresion. Habilita las ventanas emergentes.'); return; }
+win.document.write(html);
+win.document.close();
+win.focus();
+setTimeout(function(){ win.print(); }, 250);
 }
 
 function openOrderModal(table, floor){
@@ -1307,19 +1786,23 @@ overlay.innerHTML =
 '<div id="itemsList"></div>' +
 '<div class="totals">' +
 '<div class="row"><span>Subtotal</span><span id="subtotalVal">0.00</span></div>' +
+'<div class="row"><span>Impuesto (<span id="taxLabelPct">0</span>%)</span><span id="taxVal">0.00</span></div>' +
 '<div class="row"><label><input type="checkbox" id="tipEnabled"> Propina</label>' +
 '<span><input type="number" id="tipPercent" style="width:50px;" min="0" max="100"> %</span></div>' +
 '<div class="row"><span>Propina</span><span id="tipVal">0.00</span></div>' +
 '<div class="row grand"><span>Total</span><span id="totalVal">0.00</span></div>' +
 '</div>' +
 '<div style="display:flex;gap:8px;margin-top:14px;">' +
-'<button class="btn primary" id="chargeBtn">Cobrar y liberar mesa</button>' +
+'<button class="btn" id="printBtn">&#128424;&#65039; Recibo</button>' +
+'<button class="btn primary" id="chargeBtn" style="flex:1;">Cobrar y liberar mesa</button>' +
 '</div>' +
 '</div>';
 document.body.appendChild(overlay);
+wireModal(overlay);
 overlay.querySelectorAll('#miniColorRow span').forEach(function(sw){
 sw.onclick = function(){
 table.color = sw.getAttribute('data-color');
+logActivity('Cambio el color de la mesa', floor, table);
 saveState();
 renderCanvas();
 };
@@ -1333,6 +1816,7 @@ overlay.querySelector('.close-x').onclick = function(){ saveState(); overlay.rem
 overlay.addEventListener('click', function(e){ if(e.target === overlay){ saveState(); overlay.remove(); renderCanvas(); } });
 overlay.querySelector('#toggleAssist').onclick = function(){
 table.assistance = !table.assistance;
+logActivity(table.assistance ? 'Solicito asistencia' : 'Cancelo la solicitud de asistencia', floor, table);
 saveState();
 updateAssistUI();
 renderCanvas();
@@ -1346,7 +1830,8 @@ let catalogFilter = null;
 function addProductToOrder(prod){
 const existing = table.items.find(function(i){ return i.name === prod.name && i.price === prod.price && !i.ready; });
 if(existing){ existing.qty++; }
-else{ table.items.push({id: uid('i'), name: prod.name, price: prod.price, qty: 1, ready: false}); }
+else{ table.items.push({id: uid('i'), name: prod.name, price: prod.price, qty: 1, ready: false, addedAt: Date.now()}); }
+logActivity('Agrego ' + prod.name, floor, table);
 refresh();
 }
 function productsInCategory(catId){
@@ -1355,6 +1840,8 @@ return state.menu.filter(function(p){ return catId === 'none' ? !p.categoryId : 
 function buildCatTile(catId, name){
 const tile = document.createElement('div');
 tile.className = 'cat-tile';
+tile.tabIndex = 0;
+tile.setAttribute('role', 'button');
 const icon = document.createElement('div');
 icon.className = 'cat-icon';
 const withImg = productsInCategory(catId).find(function(p){ return p.image; });
@@ -1365,6 +1852,7 @@ nm.className = 'cat-name';
 nm.textContent = name;
 tile.appendChild(nm);
 tile.onclick = function(){ catalogFilter = catId; catalogView = 'products'; renderCatalogNav(); };
+tile.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); tile.click(); } });
 return tile;
 }
 function renderCatTiles(){
@@ -1389,16 +1877,22 @@ return;
 }
 items.forEach(function(prod){
 const card = document.createElement('div');
-card.className = 'catalog-card';
+card.className = 'catalog-card' + (prod.outOfStock ? ' out' : '');
+card.tabIndex = 0;
+card.setAttribute('role', 'button');
 const thumb = document.createElement('div');
 thumb.className = 'thumb';
 thumb.innerHTML = prod.image ? '<img src="' + prod.image + '">' : '🍽️';
 card.appendChild(thumb);
 const info = document.createElement('div');
 info.className = 'info';
-info.innerHTML = '<div class="pname">' + escapeHtml(prod.name) + '</div><div class="pprice">' + prod.price.toFixed(2) + '</div>';
+info.innerHTML = '<div class="pname">' + escapeHtml(prod.name) + (prod.outOfStock ? ' <span style="color:var(--danger);font-weight:400;">(agotado)</span>' : '') + '</div><div class="pprice">' + prod.price.toFixed(2) + '</div>';
 card.appendChild(info);
-card.onclick = function(){ addProductToOrder(prod); };
+card.onclick = function(){
+if(prod.outOfStock){ showAlert('Este producto esta agotado por hoy.'); return; }
+addProductToOrder(prod);
+};
+card.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); card.click(); } });
 grid.appendChild(card);
 });
 }
@@ -1440,7 +1934,7 @@ readyBadge +
 '<button class="qty-btn" data-act="remove">&times;</button>';
 row.querySelector('[data-act="plus"]').onclick = function(){ item.qty++; refresh(); };
 row.querySelector('[data-act="minus"]').onclick = function(){ item.qty = Math.max(1, item.qty - 1); refresh(); };
-row.querySelector('[data-act="remove"]').onclick = function(){ table.items = table.items.filter(function(i){ return i.id !== item.id; }); refresh(); };
+row.querySelector('[data-act="remove"]').onclick = function(){ logActivity('Quito ' + item.name, floor, table); table.items = table.items.filter(function(i){ return i.id !== item.id; }); refresh(); };
 list.appendChild(row);
 });
 }
@@ -1451,9 +1945,13 @@ const tipPercent = parseFloat(tipPercentInp.value) || 0;
 table.tipPercent = tipPercent;
 table.tipEnabled = tipEnabledChk.checked;
 const tip = table.tipEnabled ? subtotal * (tipPercent / 100) : 0;
+const taxPercent = (state.settings && state.settings.taxPercent) || 0;
+const tax = subtotal * (taxPercent / 100);
 overlay.querySelector('#subtotalVal').textContent = subtotal.toFixed(2);
+overlay.querySelector('#taxLabelPct').textContent = taxPercent;
+overlay.querySelector('#taxVal').textContent = tax.toFixed(2);
 overlay.querySelector('#tipVal').textContent = tip.toFixed(2);
-overlay.querySelector('#totalVal').textContent = (subtotal + tip).toFixed(2);
+overlay.querySelector('#totalVal').textContent = (subtotal + tax + tip).toFixed(2);
 renderCanvas();
 renderKitchenView();
 saveState();
@@ -1461,6 +1959,32 @@ saveState();
 tipEnabledChk.onchange = refresh;
 tipPercentInp.oninput = refresh;
 function doCharge(){
+if(table.items.length > 0){
+const subtotal = table.items.reduce(function(s, i){ return s + i.price * i.qty; }, 0);
+const taxPercent = (state.settings && state.settings.taxPercent) || 0;
+const tax = subtotal * (taxPercent / 100);
+const tip = table.tipEnabled ? subtotal * (table.tipPercent / 100) : 0;
+const waiter = (state.users || []).find(function(u){ return u.id === table.assignedTo; });
+if(!Array.isArray(state.sales)) state.sales = [];
+state.sales.push({
+id: uid('s'),
+floorId: floor.id,
+floorName: floor.name,
+tableLabel: table.label,
+waiterId: table.assignedTo || null,
+waiterName: waiter ? waiter.name : (currentUser ? currentUser.name : ''),
+items: table.items.map(function(i){ return {name: i.name, price: i.price, qty: i.qty}; }),
+subtotal: subtotal,
+tax: tax,
+tipPercent: table.tipEnabled ? table.tipPercent : 0,
+tip: tip,
+total: subtotal + tax + tip,
+closedAt: Date.now()
+});
+logActivity('Cobro la mesa (total ' + (subtotal + tax + tip).toFixed(2) + ')', floor, table);
+}else{
+logActivity('Libero la mesa sin cobrar', floor, table);
+}
 table.items = [];
 table.assistance = false;
 table.assignedTo = null;
@@ -1470,6 +1994,10 @@ overlay.remove();
 renderCanvas();
 renderKitchenView();
 }
+overlay.querySelector('#printBtn').onclick = function(){
+if(table.items.length === 0){ showAlert('Agrega productos antes de imprimir el recibo.'); return; }
+printReceipt(table);
+};
 overlay.querySelector('#chargeBtn').onclick = function(){
 if(table.items.length === 0){
 showConfirm('La mesa no tiene productos. Deseas liberarla de todos modos?', doCharge);
@@ -1480,11 +2008,15 @@ showConfirm('Confirmar cobro y liberar la mesa?', doCharge);
 refresh();
 }
 
+const KITCHEN_LATE_MINUTES = 10;
+let knownKitchenItemIds = null;
 function renderKitchenView(){
 const el = document.getElementById('kitchenView');
 if(!el) return;
 el.innerHTML = '';
 let any = false;
+const currentIds = new Set();
+let hasNew = false;
 state.floors.forEach(function(floor){
 floor.tables.forEach(function(table){
 if(!table.items || table.items.length === 0) return;
@@ -1497,9 +2029,13 @@ card.innerHTML = '<h3>' + escapeHtml(floor.name) + ' - Mesa ' + escapeHtml(table
 '<div class="kmeta">' + (assignedUser ? 'Mesero: ' + escapeHtml(assignedUser.name) : 'Sin mesero asignado') + '</div>';
 const itemsWrap = document.createElement('div');
 table.items.forEach(function(item){
+currentIds.add(item.id);
+if(!item.ready && knownKitchenItemIds && !knownKitchenItemIds.has(item.id)){ hasNew = true; }
+const elapsedMin = Math.max(0, Math.floor((Date.now() - (item.addedAt || Date.now())) / 60000));
+const late = !item.ready && elapsedMin >= KITCHEN_LATE_MINUTES;
 const row = document.createElement('div');
-row.className = 'kview-item' + (item.ready ? ' ready' : '');
-row.innerHTML = '<span>' + item.qty + 'x ' + escapeHtml(item.name) + '</span>';
+row.className = 'kview-item' + (item.ready ? ' ready' : '') + (late ? ' late' : '');
+row.innerHTML = '<span>' + item.qty + 'x ' + escapeHtml(item.name) + (item.ready ? '' : ' <small class="elapsed">&middot; ' + elapsedMin + ' min</small>') + '</span>';
 const btn = document.createElement('button');
 btn.textContent = item.ready ? 'Listo' : 'Marcar listo';
 btn.disabled = item.ready;
@@ -1519,6 +2055,8 @@ el.appendChild(card);
 if(!any){
 el.innerHTML = '<div class="kview-empty">No hay comandas pendientes.</div>';
 }
+if(hasNew && isCocina()){ playBeep(); }
+knownKitchenItemIds = currentIds;
 }
 
 lastLoginHadUsers = state.users && state.users.length > 0;
@@ -1528,6 +2066,44 @@ renderLoginScreen();
 initFirebase();
 const resumed = loadSession();
 if(resumed){ loginAs(resumed); }
+setInterval(function(){ renderKitchenView(); }, 20000);
+
+const INSTALL_DISMISS_KEY = 'autorest_install_dismissed';
+function registerServiceWorker(){
+if(!('serviceWorker' in navigator)) return;
+window.addEventListener('load', function(){
+navigator.serviceWorker.register('./sw.js').catch(function(e){ console.error('SW error', e); });
+});
+}
+function initInstallBanner(){
+const banner = document.getElementById('installBanner');
+const installBtn = document.getElementById('installBtn');
+const dismissBtn = document.getElementById('installDismissBtn');
+if(!banner) return;
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+if(isStandalone){ return; }
+let dismissed = false;
+try{ dismissed = !!localStorage.getItem(INSTALL_DISMISS_KEY); }catch(e){}
+if(dismissed) return;
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', function(e){
+e.preventDefault();
+deferredPrompt = e;
+banner.hidden = false;
+});
+installBtn.onclick = function(){
+if(!deferredPrompt) return;
+deferredPrompt.prompt();
+deferredPrompt.userChoice.then(function(){ deferredPrompt = null; banner.hidden = true; });
+};
+dismissBtn.onclick = function(){
+banner.hidden = true;
+try{ localStorage.setItem(INSTALL_DISMISS_KEY, '1'); }catch(e){}
+};
+window.addEventListener('appinstalled', function(){ banner.hidden = true; });
+}
+registerServiceWorker();
+initInstallBanner();
 
 </script>
 </body>
