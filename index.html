@@ -35,14 +35,15 @@
 --glow-danger:0 0 20px rgba(255,61,110,0.8);
 }
 *{box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
 body{margin:0;font-family:'Segoe UI',system-ui,Arial,sans-serif;
 background:
 radial-gradient(circle at 15% 10%, rgba(139,92,246,0.18), transparent 40%),
 radial-gradient(circle at 85% 15%, rgba(34,211,238,0.15), transparent 45%),
 linear-gradient(180deg,var(--bg-a),var(--bg-b));
 background-attachment:fixed;
-color:var(--text); min-height:100vh;}
-header{
+color:var(--text);}
+header{flex-shrink:0;
 background:rgba(10,12,26,0.75);
 backdrop-filter:blur(14px);
 -webkit-backdrop-filter:blur(14px);
@@ -74,9 +75,16 @@ text-shadow:0 0 24px rgba(139,92,246,0.35);
 .floor-tab.active .mini-btn:hover{background:rgba(0,0,0,0.2);}
 .add-floor-btn{padding:8px 14px;border-radius:20px;border:1.5px dashed rgba(139,92,246,0.5);background:transparent;cursor:pointer;color:#c7cdea;font-size:13px;transition:all .18s;}
 .add-floor-btn:hover{background:rgba(139,92,246,0.12);border-color:var(--accent2);color:#fff;}
-#canvas-wrap{position:relative;height:calc(100vh - 132px);overflow:auto;background-image:radial-gradient(circle,rgba(139,92,246,0.18) 1px,transparent 1.4px);background-size:28px 28px;}
-#canvas{position:relative;min-width:100%;min-height:100%;}
+#appRoot{height:100%;flex-direction:column;}
+#canvas-wrap{position:relative;flex:1;min-height:0;overflow:hidden;cursor:grab;touch-action:none;}
+#canvas-wrap.panning{cursor:grabbing;}
+#canvas{position:absolute;top:0;left:0;width:3200px;height:2400px;transform-origin:0 0;background-image:radial-gradient(circle,rgba(139,92,246,0.18) 1px,transparent 1.4px);background-size:28px 28px;}
 .empty-hint{position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);color:var(--muted);font-size:14px;text-align:center;pointer-events:none;width:80%;line-height:1.6;}
+.zoom-controls{position:absolute;left:14px;bottom:14px;z-index:30;display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(10,12,26,0.78);backdrop-filter:blur(10px);border:1px solid var(--border-soft);border-radius:12px;padding:7px;box-shadow:0 6px 18px rgba(0,0,0,0.4);}
+.zoom-controls button{width:34px;height:34px;border-radius:8px;border:1px solid var(--border-soft);background:rgba(255,255,255,0.05);color:var(--text);font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.zoom-controls button:hover{background:rgba(139,92,246,0.2);border-color:var(--accent);}
+.zoom-controls button:active{transform:scale(0.94);}
+.zoom-controls .zoom-label{font-size:10px;text-align:center;color:var(--muted);font-family:ui-monospace,monospace;padding:1px 0 3px;min-width:34px;}
 .table-el{position:absolute;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;user-select:none;touch-action:none;cursor:pointer;text-align:center;padding:4px;letter-spacing:.2px;
 border:2px solid rgba(255,255,255,0.35);
 box-shadow:0 8px 22px rgba(0,0,0,0.45), var(--glow-accent);
@@ -167,7 +175,7 @@ display:flex;align-items:center;justify-content:center;z-index:300;}
 .assign-tag{position:absolute;top:-10px;left:-10px;background:rgba(10,12,26,0.9);border:1px solid var(--border-soft);border-radius:10px;padding:2px 6px;font-size:10px;color:#c7cdea;max-width:74px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .table-el.dirty{opacity:.6;filter:grayscale(.5);}
 .clean-tag{position:absolute;bottom:-10px;right:-10px;background:rgba(10,12,26,0.9);border:1px solid var(--border-soft);border-radius:10px;padding:2px 6px;font-size:10px;color:#c7cdea;white-space:nowrap;}
-#kitchenView{padding:18px;display:none;flex-wrap:wrap;gap:14px;align-content:flex-start;height:calc(100vh - 132px);overflow-y:auto;}
+#kitchenView{padding:18px;display:none;flex-wrap:wrap;gap:14px;align-content:flex-start;height:100%;overflow-y:auto;box-sizing:border-box;}
 .kview-card{background:var(--panel);border:1px solid var(--border-soft);border-radius:14px;padding:14px;width:260px;box-shadow:var(--shadow);height:fit-content;}
 .kview-card h3{margin:0 0 4px;font-size:15px;}
 .kview-card .kmeta{font-size:11px;color:var(--muted);margin-bottom:10px;}
@@ -262,6 +270,13 @@ display:flex;align-items:center;justify-content:center;z-index:300;}
 </header>
 <div id="canvas-wrap">
 <div id="canvas"></div>
+<div id="emptyHint" class="empty-hint" hidden>Lienzo vacio. Usa el menu de construccion (abajo) para agregar mesas.</div>
+<div class="zoom-controls" id="zoomControls">
+<button id="zoomInBtn" title="Acercar" aria-label="Acercar">+</button>
+<div class="zoom-label" id="zoomLabel">100%</div>
+<button id="zoomOutBtn" title="Alejar" aria-label="Alejar">&minus;</button>
+<button id="zoomResetBtn" title="Restablecer vista" aria-label="Restablecer vista">&#8982;</button>
+</div>
 <div id="kitchenView"></div>
 </div>
 
@@ -416,7 +431,7 @@ function loginAs(user){
 currentUser = user;
 saveSession(user);
 document.getElementById('loginScreen').style.display = 'none';
-document.getElementById('appRoot').style.display = 'block';
+document.getElementById('appRoot').style.display = 'flex';
 applyBranding();
 applyRoleUI();
 renderFloors();
@@ -529,6 +544,8 @@ viewMode = mode;
 document.getElementById('canvas').style.display = mode === 'floor' ? 'block' : 'none';
 document.getElementById('kitchenView').style.display = mode === 'kitchen' ? 'flex' : 'none';
 document.getElementById('floorsContainer').style.display = mode === 'floor' ? 'flex' : 'none';
+const zc = document.getElementById('zoomControls');
+if(zc) zc.style.display = mode === 'floor' ? 'flex' : 'none';
 if(mode === 'kitchen') renderKitchenView();
 }
 
@@ -849,7 +866,108 @@ saveState(); renderFloors(); renderCanvas();
 };
 
 const canvas = document.getElementById('canvas');
+const canvasWrap = document.getElementById('canvas-wrap');
 let dragged = false;
+
+/* ---------- Pan y zoom libre del piso ---------- */
+let viewTransform = { x: 40, y: 40, scale: 1 };
+const VIEW_MIN_SCALE = 0.35, VIEW_MAX_SCALE = 2.5;
+let lastRenderedFloorId = null;
+let viewDragged = false;
+function applyViewTransform(){
+canvas.style.transform = 'translate(' + viewTransform.x + 'px,' + viewTransform.y + 'px) scale(' + viewTransform.scale + ')';
+const zoomLabel = document.getElementById('zoomLabel');
+if(zoomLabel) zoomLabel.textContent = Math.round(viewTransform.scale * 100) + '%';
+}
+function resetViewTransform(){
+viewTransform = { x: 40, y: 40, scale: 1 };
+applyViewTransform();
+}
+function zoomAt(newScale, clientX, clientY){
+newScale = Math.min(VIEW_MAX_SCALE, Math.max(VIEW_MIN_SCALE, newScale));
+const rect = canvasWrap.getBoundingClientRect();
+const originX = clientX - rect.left;
+const originY = clientY - rect.top;
+const worldX = (originX - viewTransform.x) / viewTransform.scale;
+const worldY = (originY - viewTransform.y) / viewTransform.scale;
+viewTransform.scale = newScale;
+viewTransform.x = originX - worldX * newScale;
+viewTransform.y = originY - worldY * newScale;
+applyViewTransform();
+}
+function zoomButtonStep(delta){
+const rect = canvasWrap.getBoundingClientRect();
+zoomAt(viewTransform.scale + delta, rect.left + rect.width / 2, rect.top + rect.height / 2);
+}
+canvasWrap.addEventListener('wheel', function(e){
+if(viewMode !== 'floor') return;
+e.preventDefault();
+zoomAt(viewTransform.scale + (e.deltaY > 0 ? -0.12 : 0.12), e.clientX, e.clientY);
+}, { passive: false });
+
+const panPointers = new Map();
+let panPointerId = null, panStart = null, panMoved = false, pinchStartDist = null, pinchStartScale = 1;
+canvasWrap.addEventListener('pointerdown', function(e){
+if(viewMode !== 'floor') return;
+if(e.pointerType === 'mouse' && e.button !== 0) return;
+const onTable = e.target.closest('.table-el');
+const onSign = e.target.closest('.sign-el');
+if((onTable || onSign) && isAdmin() && editMode) return;
+panPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+if(panPointers.size === 1){
+panPointerId = e.pointerId;
+panStart = { x: e.clientX, y: e.clientY, vx: viewTransform.x, vy: viewTransform.y };
+panMoved = false;
+window.addEventListener('pointermove', onCanvasPointerMove);
+window.addEventListener('pointerup', onCanvasPointerUp);
+window.addEventListener('pointercancel', onCanvasPointerUp);
+}else if(panPointers.size === 2){
+panPointerId = null;
+const pts = Array.from(panPointers.values());
+pinchStartDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y) || 1;
+pinchStartScale = viewTransform.scale;
+}
+});
+function onCanvasPointerMove(e){
+if(!panPointers.has(e.pointerId)) return;
+panPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+if(panPointers.size >= 2){
+const pts = Array.from(panPointers.values());
+const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y) || 1;
+const midX = (pts[0].x + pts[1].x) / 2, midY = (pts[0].y + pts[1].y) / 2;
+zoomAt(pinchStartScale * (dist / pinchStartDist), midX, midY);
+panMoved = true;
+return;
+}
+if(panPointerId !== e.pointerId || !panStart) return;
+const dx = e.clientX - panStart.x, dy = e.clientY - panStart.y;
+if(Math.abs(dx) > 3 || Math.abs(dy) > 3) panMoved = true;
+viewTransform.x = panStart.vx + dx;
+viewTransform.y = panStart.vy + dy;
+applyViewTransform();
+canvasWrap.classList.add('panning');
+}
+function onCanvasPointerUp(e){
+panPointers.delete(e.pointerId);
+if(panPointers.size < 2){ pinchStartDist = null; }
+if(panPointers.size === 0){
+window.removeEventListener('pointermove', onCanvasPointerMove);
+window.removeEventListener('pointerup', onCanvasPointerUp);
+window.removeEventListener('pointercancel', onCanvasPointerUp);
+canvasWrap.classList.remove('panning');
+if(panMoved){
+viewDragged = true;
+setTimeout(function(){ viewDragged = false; }, 0);
+}
+panPointerId = null;
+panStart = null;
+panMoved = false;
+}
+}
+document.getElementById('zoomInBtn').onclick = function(){ zoomButtonStep(0.25); };
+document.getElementById('zoomOutBtn').onclick = function(){ zoomButtonStep(-0.25); };
+document.getElementById('zoomResetBtn').onclick = resetViewTransform;
+
 function fillStyleToCss(color, fillStyle){
 if(fillStyle === 'gradient'){ return 'linear-gradient(135deg, ' + color + ', #ffffffaa)'; }
 if(fillStyle === 'striped'){ return 'repeating-linear-gradient(45deg, ' + color + ', ' + color + ' 8px, #ffffff55 8px, #ffffff55 16px)'; }
@@ -860,12 +978,11 @@ function renderCanvas(){
 canvas.innerHTML = '';
 const floor = getActiveFloor();
 if(!floor){ return; }
-if(floor.tables.length === 0){
-const hint = document.createElement('div');
-hint.className = 'empty-hint';
-hint.textContent = 'Lienzo vacio. Usa el menu de construccion (abajo) para agregar mesas.';
-canvas.appendChild(hint);
+if(floor.id !== lastRenderedFloorId){
+lastRenderedFloorId = floor.id;
+resetViewTransform();
 }
+document.getElementById('emptyHint').hidden = floor.tables.length !== 0;
 floor.tables.forEach(function(table){
 const el = document.createElement('div');
 el.className = 'table-el ' + table.shape + (table.assistance ? ' blink' : '') + (table.dirty ? ' dirty' : '');
@@ -934,7 +1051,7 @@ el.appendChild(bell);
 }
 
 el.onclick = function(e){
-if(dragged){ dragged = false; return; }
+if(dragged || viewDragged){ dragged = false; return; }
 if(isAdmin() && editMode){ openEditModal(table, floor); return; }
 if(table.dirty){ openCleaningModal(table, floor); return; }
 if(isAdmin()){ openOrderModal(table, floor); return; }
@@ -1002,7 +1119,7 @@ el.setAttribute('role', 'button');
 el.setAttribute('aria-label', 'Cartel: ' + sign.text);
 let signDragged = false;
 el.onclick = function(){
-if(signDragged){ signDragged = false; return; }
+if(signDragged || viewDragged){ signDragged = false; return; }
 openSignModal(sign, floor);
 };
 el.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); el.click(); } });
